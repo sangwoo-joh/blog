@@ -5,22 +5,19 @@ permalink: /about/
 last_update: 2024-07-26 14:39:34
 ---
 
-## About Me
-
- - full-stack software engineer
- - applied programming languages engineer
- - OCaml, doomemacs, org-roam
+## Myself
+ - Applied PL Engineer
 
 ## Interests
- - programming languages theory
- - engineering leadership
- - parallel & asynchronous programming
+ - Programming Languages and Type Theory
+ - Engineering Leadership
+ - Parallel & Asynchronous Programming
 
 ## Mantra
 
 > We don't rise to the level of our expectations; we fall to the level of our training. - Archilochus
 
-> Before you speak, let your words pass through three gates: Is it true? Is it necessary? Is it kind?
+> Plans are useless, but planning is indispensable. - Dwight Eisenhower
 
 ## Works
  - [Book](/book)
