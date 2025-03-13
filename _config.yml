@@ -1,4 +1,4 @@
-title: Untitled
+title: Untyped
 email: work.sangwoo.joh@gmail.com
 description:
 author: sangwoo-joh
@@ -16,7 +16,7 @@ permalink: /:title
 # remote_theme: riggraz/no-style-please
 theme_config:
   appearance: "auto" # can be "light", "dark" or "auto"
-  back_home_text: "/untitled" # customize text for homepage link in post layout
+  back_home_text: "/untyped" # customize text for homepage link in post layout
   date_format: "%Y-%m-%d" # customize how date is formatted
 
 sass:
