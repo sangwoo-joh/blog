@@ -267,10 +267,10 @@ let ( <|> ) : 'a parser -> 'a parser -> 'a parser =
   fun p1 p2 ->
   { run =
     fun input ->
-      let input', res = p1.run input in
+      let input', result = p1.run input in
       match result with
       | Ok x -> input', Ok x
-      | Error _ -> p2.run ipnut
+      | Error _ -> p2.run input
   }
 ```
 
