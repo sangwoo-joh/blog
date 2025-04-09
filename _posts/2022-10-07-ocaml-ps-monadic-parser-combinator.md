@@ -503,10 +503,28 @@ let rec expr () =
 
 그러면 대체 어떻게 해야 재귀적인 파서를 만들어주는 컴비네이터를 만들 수 있을까?
 
-막혔을 때는 망설임없이 선인들의 지혜를 살펴보는 것이 좋다. 먼저 `Parcoom`에는 이와 유사한 [`many`](https://github.com/tsoding/parcoom/blob/main/src/parcoom.ml#L129-L143)라는 컴비네이터가 있는데, 이는 파싱에 실패할 때까지 계속 파싱해서 리스트로 결과를 쌓아주는 컴비네이터이다. 뇌에 힘을 줘서 이 구현을 참조하면 원하는 컴비네이터를 만들 수 있겠지만 여기서는 다른 방식으로 구현할 것이다.
+막혔을 때는 망설임없이 선인들의 지혜를 살펴보는 것이 좋다.
 
-왜냐하면 `Angstrom`에 더 멋진 해결책이 있기 때문이다. 재귀적인 데이터를 파싱한다고 해서 무한히 파싱 가능한 것은 아니다. 파싱한 결과를 계속 쌓아 나아가다 보면 결과가 더 이상 쌓이지 않는 시점이 오는데, 이를 보통 Fixed Point라고 하고 이를 계산해주는 컴비네이터를 [Fixed Point 컴비네이터](https://en.wikipedia.org/wiki/Fixed-point_combinator)라고 한다. 그리고 `Angstrom`의 [`fix`](https://ocaml.org/p/angstrom/0.14.0/doc/Angstrom/index.html#val-fix)가 정확히 이 역할을 한다. 파서의 Fixed Point를 계산해주는 파서를 만들어주는 컴비네이터이다.
+먼저 이론적인 배경을 람다 대수에서 찾아볼 수 있다. [Fixed-point combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator)를 이용하면, 어떤 fixed point가 존재하는 함수 f에 대해서, 이 컴비네이터 fix를 이용하면 fix f 를 계산할 수 있고 보통 fix f = f (fix f) 와 같이 계산된다. 특히 하스켈 커리가 구현한 Y combinator는 다음과 같다.
 
+$$ Y = \lambda f. (\lambda x. f (x x)) (\lambda x. f (x x)) $$
+
+OCaml에서는 간단하게 다음과 같이 단순한 Y combinator를 구현할 수도 있다.
+
+```ocaml
+let rec fix f x = f (fix f) x
+
+(** example *)
+let fact f = function
+  | 0 -> 1
+  | x -> x * f (x - 1)
+
+let factorial = fix fact
+
+let _ = factorial 5 (* evaluates to 120 **)
+```
+
+우리가 관심있는 파서로 돌아와보자. `Angstrom`에는 [`fix`](https://ocaml.org/p/angstrom/0.14.0/doc/Angstrom/index.html#val-fix)라는 함수가 있는데, 이 함수가 바로 이름 그대로 어떤 파서의 Fixed-point 를 계산해내는 역할을 한다. 다음과 같이 짧은 구현으로 이루어져 있다.
 
 ```ocaml
 let fix : ('a parser -> 'a parser) -> 'a parser =
@@ -516,7 +534,7 @@ let fix : ('a parser -> 'a parser) -> 'a parser =
     r
 ```
 
-재귀적인 함수 값을 정의하기 위해서 스스로를 파라미터로 받는 함수를 만들어서 적용했다. 여기 적용된 기법은 [신발 끈 묶기 기법(Tying-the-knot technique)](https://wiki.haskell.org/Tying_the_Knot)이라고 하는 것 같은데, 재귀적으로는 불가능해 보이는 것들을 정의하게 해주는 기법이다. `Angstrom`은 [Lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation)을 이용해서 이를 구현하고 있는데, `Lazy`를 벗겨내면 위 코드는 아래 코드와 동일하다.
+즉, 람다 대수의 Y combinator와 유사하게, 재귀적인 함수를 정의하기 위해 정의하려고 하는 대상 함수(여기서는 파서 f)를 파라미터로 받아서, 이를 이용해서 새로운 재귀적인 함수(파서)를 계산하는 함수이다. `Angstrom`은 [Lazy evaluation](https://en.wikipedia.org/wiki/Lazy_evaluation)을 이용해서 이를 구현하고 있는데, `Lazy`를 벗겨내면 위 코드는 아래 코드와 동일하다.
 
 ```ocaml
 let fix f =
@@ -524,7 +542,7 @@ let fix f =
   r
 ```
 
-즉, `fix (fun r -> ...)`은 `r`을 재귀적으로 적용할 수 있는 파서를 만들어준다. 코드를 보면, 함수 `f`의 파라미터 `r`은 `fix f`가 리턴하는 (즉, 만들고자 하는) 파서 `fix (fun r -> ...)`과 같다는 것을 알 수 있다. `r`을 호출하지 않고 파싱에 성공한 경우는 더 이상 재귀호출이 없으므로 종료된다.
+람다 대수와 완전히 동일하진 않지만, Y combinator와 유사하게 정의하고자 하는 재귀적인 파서를 파라미터로 받아서 (즉, $$\lambda f.$$) 이 함수를 사용하는 새로운 파서를 계산해내는 (즉, $$(\lambda x. f ...)$$) 모습을 따르고 있다.
 
 예를 들어, 우리의 표현식을 생각해보자. `Var`를 제외한 나머지 타입은 귀납적으로 정의되어 있어서, `expr`을 파싱하려면 `expr` 파서를 호출해야 한다. 따라서 코드를 다음과 같이 작성할 수 있다:
 
