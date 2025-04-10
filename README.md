@@ -1,4 +1,4 @@
-# Caml Shaving :camel:
+# Untyped Blog
 
  - Based on
    [no-style-please](https://github.com/riggraz/no-style-please)
