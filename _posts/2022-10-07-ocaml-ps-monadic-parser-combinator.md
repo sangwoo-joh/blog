@@ -208,7 +208,7 @@ let ( >>= ) = bind
 
 #### 리프팅
 
-먼저 [`lift` 패밀리 컴비네이터](https://ocaml.org/p/angstrom/0.14.0/doc/Angstrom/index.html#val-lift)를 만들 것이다. `lift` 모나드에 대한 설명은 하스켈 위키의 [lifting](https://wiki.haskell.org/Lifting)에 잘 정리되어 있다. 이 컴비네이터는 함수 하나와 여러 개의 파서를 입력으로 받아서, 입력으로 받은 파서를 *차례대로* 실행해서 값을 파싱한 다음, 파싱한 값들을 *차례대로* 함수에 적용한 결과를 파싱하는 파서를 만든다. 보통 `lift`부터 `lift2`, `lift3`처럼 함수의 입력 파라미터 개수에 따라 정의되는 것 같고 타입은 다음과 같다:
+먼저 [`lift` 패밀리 컴비네이터](https://ocaml.org/p/angstrom/0.14.0/doc/Angstrom/index.html#val-lift)를 만들 것이다. `lift` 모나드에 대한 설명은 하스켈 위키의 [lifting](https://wiki.haskell.org/Lifting)에 잘 정리되어 있다. 이 컴비네이터는 함수 하나와 여러 개의 파서를 입력으로 받아서, 입력으로 받은 파서를 *차례대로* 실행해서 값을 파싱한 다음, 파싱한 결과들을 받아서 *차례대로* 함수에 적용한 결과를 계산하는 파서를 만든다. 보통 `lift`부터 `lift2`, `lift3`처럼 함수의 입력 파라미터 개수에 따라 정의되는 것 같고 타입은 다음과 같다:
 
 ```ocaml
 val lift  : ('a -> 'b) -> 'a parser -> 'b parser
