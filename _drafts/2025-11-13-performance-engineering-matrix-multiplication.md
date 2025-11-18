@@ -348,7 +348,7 @@ cilk_for (int i = 0; i < n; i++)
 
 최종 코드는 위와 같다. 이렇게 3.18초, 최대 성능 대비 **5.170%**를 끌어내었다. 드디어 한 자릿 수까지 왔다. 참고로 이 수치는 18개의 물리 코어를 모두 활용해서 얻은 수치이며, 병렬 처리를 하지 않은 버전 5 대비 약 18배 빠르다.
 
-### 버전 7
+### 버전 7: 메모리 접근 최적화
 이제 우리 프로그램은 타입을 컴파일 타임에 알아내어서 머신 코드로 바로 실행되는 바이너리로 컴파일되고, 공간 지역성도 잘 지켰고, 컴파일러 최적화도 했고, 모든 18개의 물리 코어를 다 쓰도록 했다. 사실 여기까지가 내가 그동안 알고 있던 최적화의 내용이기도 하다. 그런데도 왜 여전히 최대 성능의 5% 밖에 안되는 걸까? 어떻게 하면 하드웨어의 고급 기능을 다 활용할 수 있을까?
 
 우리는 아직까지 하드웨어 캐시를 다 활용하고 있지 못하다. 데이터를 최대한 **재사용**하도록 계산의 구조를 재정렬하면 캐시 미스를 최소한으로 줄이고 캐시 히트를 최대한 늘릴 수 있다.
@@ -362,7 +362,7 @@ cilk_for (int i = 0; i < n; i++)
 
 ![row](/assets/img/matrix-mul-row.png)
 
-데이터를 재사용하려면 메모리에 어떤 식으로 접근해야 할까? 행렬 C를 계산할 때 행 하나가 아니라, s by s 크기의 *타일*로 접근한다고 해보자. 일단은 s=64, 즉 64x64 크기의 타일만 계산해보자.
+데이터를 재사용하려면 메모리에 어떤 식으로 접근해야 할까? 행렬 C를 계산할 때 행 하나가 아니라, 64x64 크기의 *타일*로 접근한다고 해보자.
  * 64 $$\times$$ 64 (타일 크기) = 4096 번 C에 쓰기 작업이 필요하고,
  * 64 $$\times$$ 4096 = 262,144 번 A에서 읽어야 하고,
  * 4096 $$\times$$ 64 = 262,144 번 B에서 읽어야 한다.
@@ -371,9 +371,7 @@ cilk_for (int i = 0; i < n; i++)
 
 ![block](/assets/img/matrix-mul-block.png)
 
-오! 메모리 접근 횟수가 줄었다. 알고리즘 시간에 배웠던 분할 정복의 위력을 눈으로 확인한 순간이다.
-
-그럼 일단 이걸 나이브하게 구현하면 다음과 같다.
+오! 메모리 접근 횟수가 줄었다. 알고리즘 시간에 배웠던 분할 정복의 위력을 눈으로 확인한 순간이다. 역시 이 타일의 크기도 튜닝 가능한 파라미터 값이므로, 이걸 조절할 수 있도록 정사각형 타일의 크기를 s라고 했을 때, 병렬 처리 없이 다음과 같이 구현할 수 있다.
 
 ```c
 for (int ih = 0; ih < n; ih += s)
@@ -415,15 +413,146 @@ cilk_for (int ih = 0; ih < n; ih += s)
 
 오! 타일 크기가 32일 때 수행 시간도 절반 가까이로 줄어든 것을 볼 수 있다. 이 32라는 타일 크기는 항상 통용되는 값이 아니라, 문제에 따라 조절해야 하는 파라미터이다. 최적의 성능을 위한 값은 이렇게 실험을 통해 알아내는 수 밖에 없다.
 
+타일링은 같은 개수의 원소를 계산하는데 필요한 메모리 접근 횟수만 줄이는게 아니라, 캐시 히트율도 엄청나게 올린다. 버전 6에서 그냥 Cilk를 적용한 것과 이번 버전에서 타일링을 적용한 것 각각의 캐시 성능을 비교하면, LLC 기준으로 95%의 성능 향상을 볼 수 있다.
 
-### 버전 8
-### 버전 9
-### 버전 10
-### 버전 11
-사실 이미 선구자들이 행렬 곱셈 문제에 있어서는 이런 발견과 실험을 통해 거쳐온 최적화의 역사가 있기 때문에 우리가 이걸 알 수 있었다. 그리고 이 최적화는 라이브러리의 형태로 공개되어 있는 것들이 많은데, 그 중 하나는 인텔의 MKL (Math Kernel Library) 이다.
+| 버전                | 캐시 레퍼런스 (백만) | L1 데이터 캐시 미스 (백만) | LLC 미스 (백만) |
+|---------------------|---------------------:|---------------------------:|----------------:|
+| 버전 6 (병렬 처리 ) |              104,090 |                     17,220 |           8,600 |
+| 버전 7 (타일링)     |               64,690 |                     11,777 |             416 |
+
+### 버전 8: 병렬 분할정복
+멀티 코어의 캐시 및 메모리 구조를 조금만 더 자세히 살펴보자.
+
+| 단계        | 크기  | 정보           | 레이턴시 (ns) |
+|-------------|-------|----------------|--------------:|
+| 메인 메모리 | 60GB  |                |            50 |
+| LLC (L3)    | 25MB  | 20-way, shared |            12 |
+| L2          | 256KB | 8-way, private |             4 |
+| L1-d        | 32KB  | 8-way, private |             2 |
+| L1-i        | 32KB  | 8-way, private |             2 |
+
+Shared인 LLC를 제외하면 private 캐시인 L1, L2 총 두 개가 있고 이 둘이 매우매우 빠르다. 따라서 이 두 단계의 캐시를 최대한 활용하는 것이 성능 엔지니어링에 있어 필수적이다.
+
+어떻게 하면 좋을까? 핵심 아이디어는 알고리즘 시간에 배웠던 분할 정복을 떠올리는 것이다. 타일링을 항상 같은 크기인 s로 하는 것이 아니라, 2의 모든 거듭 제곱 크기에 대해서 **동시에** 타일링을 진행한다. 예를 들어 NxN 행렬의 곱셈 문제를 다음과 같이 N/2xN/2 행렬을 8번 곱한 다음 NxN 행렬을 한번 더하는 문제로 바꾸면, 부분 문제인 N/2xN/2의 곱셈이 결국 타일링과 같아진다. 그리고 이걸 재귀적으로 적용해서 타일링된 행렬의 곱셈 역시 타일링하여 계산하게 되면, 메모리 접근 성능과 캐시 활용을 극적으로 끌어올릴 수 있다. 추가로 이렇게 N/2xN/2로 쪼갠 부분 문제들은 서로 의존성이 없기 때문에, 이 부분 문제들을 풀 때 병렬 처리를 적극 적용할 수 있게 된다.
+
+$$
+\begin{align*}
+\begin{bmatrix}
+C_{0,0} & C_{0,1} \\
+C_{1,0} & C_{1,1} \\
+\end{bmatrix}
+&=
+\begin{bmatrix}
+A_{0,0} & A_{0,1} \\
+A_{1,0} & A_{1,1} \\
+\end{bmatrix}
+\times
+\begin{bmatrix}
+B_{0,0} & B_{0,1} \\
+B_{1,0} & B_{1,1} \\
+\end{bmatrix}
+\\
+
+&=
+\begin{bmatrix}
+A_{0,0}B_{0,0} & A_{0,0}B_{0,1} \\
+A_{1,0}B_{0,0} & A_{1,0}B_{0,1} \\
+\end{bmatrix}
++
+\begin{bmatrix}
+A_{0,1}B_{1,0} & A_{0,1}B_{1,1} \\
+A_{1,1}B_{1,0} & A_{1,1}B_{1,1} \\
+\end{bmatrix}
+\\
+\end{align*}
+$$
+
+이렇게 문제를 쪼개면 결국 가장 풀기 쉬운 부분 문제인 기저 조건 (Base Case) 까지 닿게 된다. 그런데 기저 조건의 크기가 너무 작으면, 즉 문제를 너무 잘게 쪼개면 오히려 성능이 떨어질 수도 있다. 그러므로 이 접근에서 튜닝할 수 있는 파라미터는 **기저 조건의 크기**가 된다. 따라서, 구현은 다음과 같이 된다.
 
 ```c
+void mm_dac(
+  double *restrict C, int n_C,
+  double *restrict A, int n_A,
+  double *restrict B, int n_B,
+  int n) {
+  // C += A * B
+  if (n <= THRESHOLD) {
+    mm_base (C, n_C, A, n_A, B, n_B, n);
+  } else {
+#define X(M,r,c) (M + (r*(n_ ## M) + c)*(n/2))
+    cilk_spawn mm_dac(X(C,0,0), n_C, X(A,0,0), n_A, X(B,0,0), n_B, n/2);
+    cilk_spawn mm_dac(X(C,0,1), n_C, X(A,0,0), n_A, X(B,0,1), n_B, n/2);
+    cilk_spawn mm_dac(X(C,1,0), n_C, X(A,1,0), n_A, X(B,0,0), n_B, n/2);
+               mm_dac(X(C,1,1), n_C, X(A,1,0), n_A, X(B,0,1), n_B, n/2);
+    cilk_sync;
+    cilk_spawn mm_dac(X(C,0,0), n_C, X(A,0,1), n_A, X(B,1,0), n_B, n/2);
+    cilk_spawn mm_dac(X(C,0,1), n_C, X(A,0,1), n_A, X(B,1,1), n_B, n/2);
+    cilk_spawn mm_dac(X(C,1,0), n_C, X(A,1,1), n_A, X(B,1,0), n_B, n/2);
+               mm_dac(X(C,1,1), n_C, X(A,1,1), n_A, X(B,1,1), n_B, n/2);
+    cilk_sync;
+  }
+}
+```
 
+### 버전 9: Vectorization
+### 버전 10: AVX Intrinsics
+### 버전 11: 인더스트리 라이브러리
+사실 여기까지 노력했던 모든 최적화들은 인더스트리에서 쓰이는 행렬 라이브러리에 다 녹아 있다. 예를 들어 인텔의 MKL (Math Kernel Library)에는 이 모든 최적화들이 다 들어있다.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include "mkl.h"
+
+#define SIZE_MATRIX 4096
+#define SIZE_TILING 32
+
+int main() {
+  double *A, *B, *C;
+
+  // 64-byte alignment
+  A = (double *) mkl_malloc(SIZE_MATRIX * SIZE_MATRIX * sizeof(double), 64);
+  B = (double *) mkl_malloc(SIZE_MATRIX * SIZE_MATRIX * sizeof(double), 64);
+  C = (double *) mkl_malloc(SIZE_MATRIX * SIZE_MATRIX * sizeof(double), 64);
+
+  //
+  // initialise matrices with randome values...
+  //
+
+  for (int tj = 0; tj < SIZE_MATRIX; tj += SIZE_TILING) {
+    for (int ti = 0; ti < SIZE_MATRIX; ti += SIZE_TILING) {
+      for (tk = 0; tk < k; tk += SIZE_TILING) {
+        int tile_m = (ti + SIZE_TILING > SIZE_MATRIX) ? (SIZE_MATRIX - ti) : SIZE_TILING;
+        int tile_n = (tj + SIZE_TILING > SIZE_MATRIX) ? (SIZE_MATRIX - tj) : SIZE_TILING;
+        int tile_k = (tk + SIZE_TILING > SIZE_MATRIX) ? (SIZE_MATRIX - tk) : SIZE_TILING;
+        // 첫번째 반복일때만 0, 이후는 누적(1.0)
+        double beta_val = (tk == 0) ? 0.0 : 1.0;
+
+        cblas_dgemm(
+          CblasRowMajor,
+          CblasNoTrans,
+          CblasNoTrans,
+          tile_m,
+          tile_n,
+          tile_k,
+          alpha,
+          B + ti * k + tk,            // B의 타일 시작 위치
+          SIZE_MATRIX,                // B의 leading dimension
+          A + tk * SIZE_MATRIX + tj,  // A의 타일 시작 위치
+          SIZE_MATRIX,                // A의 leading dimension
+          beta_val,
+          C + ti * SIZE_MATRIX + tj,  // C의 타일 시작 위치
+          SIZE_MATRIX);               // C의 leading dimension
+      }
+    }
+  }
+
+  mkl_free(A);
+  mkl_free(B);
+  mkl_free(C);
+
+  return 0;
+}
 ```
 
 ### 정리 및 최종 결론
