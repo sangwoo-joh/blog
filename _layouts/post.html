@@ -28,7 +28,7 @@ layout: default
 {% for tag in page.tags %}
 
 {% if site.data.tags contains tag %}
-<a href="/archive?tag={{ tag }}"><span class="tag">{{ tag }}</span></a>
+  <a href="/archive?tag={{ tag }}"><span class="tag">{{ tag }}</span></a>
 {% endif %}
 
 {% endfor %}
@@ -38,7 +38,21 @@ layout: default
 
 {{ content }}
 
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-svg.js"></script>
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    },
+    chtml: {
+      displayAlign: 'center',
+      displayIndent: '0'
+    },
+    svg: {
+      displayAlign: 'center',
+      displayIndent: '0'
+    }
+  };
 </script>
 
 <br />

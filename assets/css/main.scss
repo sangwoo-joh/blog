@@ -16,3 +16,12 @@ $monospace: 'Roboto Mono';
 .language-plaintext {
   font-family: $monospace;
 }
+
+.kdmath {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+body {
+  overflow-x: hidden;
+}
