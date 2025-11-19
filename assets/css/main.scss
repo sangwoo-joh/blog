@@ -17,9 +17,10 @@ $monospace: 'Roboto Mono';
   font-family: $monospace;
 }
 
-.kdmath {
-  overflow-x: scroll;
-  overflow-y: hidden;
+mjx-container {
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 body {
