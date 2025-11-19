@@ -5,7 +5,7 @@ tag: [dev, performance]
 title: 성능 엔지니어링 - 행렬 곱셈 이야기
 ---
 
-발단: 평소처럼 재미있는 글이 없나 하고 [긱뉴스](https://news.hada.io/)를 탐방하다가 [컴파일러 엔지니어가 되는 법](https://rona.substack.com/p/becoming-a-compiler-engineer)이라는 글을 보게 되었다. 한국에서만 컴파일러 관련 포지션이 적은건가 싶었는데 미국도 상황은 비슷한가보구나, 라고 생각하면서 읽다가, 저자의 추천 MIT OCW [Performance Engineering](https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/) 강의를 만나게 되었다. 마침 최근 내 관심사와 맞닿아 있는 주제라서 강의 슬라이드를 보고 있는데 너무 재밌어서 내 식으로 소화도 할 겸 좀 정리해보려고 한다. 마침 [MIT OpenCourseWare 라이센스](https://ocw.mit.edu/pages/privacy-and-terms-of-use/)도 출처만 표기한다면 너그러운 편이다.
+발단: 평소처럼 재미있는 글이 없나 하고 [긱뉴스](https://news.hada.io/)를 탐방하다가 [컴파일러 엔지니어가 되는 법](https://rona.substack.com/p/becoming-a-compiler-engineer)이라는 글을 보게 되었다. 한국에서만 컴파일러 관련 포지션이 적은건가 싶었는데 미국도 상황은 비슷한가보구나, 라고 생각하면서 읽다가, 저자의 추천으로 MIT OCW의 [Performance Engineering](https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/) 강의를 만나게 되었다. 마침 최근 내 관심사와 맞닿아 있는 주제라서 강의 슬라이드를 보고 있는데 너무 재밌어서 내 식으로 소화도 할 겸 좀 정리해보려고 한다. 마침 [MIT OpenCourseWare 라이센스](https://ocw.mit.edu/pages/privacy-and-terms-of-use/)도 출처만 표기한다면 너그러운 편이다.
 
 [1강](https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/resources/lecture-1-introduction-and-matrix-multiplication/)은 성능 엔지니어링 전반에 대한 이야기를 시작으로, 행렬 곱셈을 어디까지 최적화할 수 있는지에 대한 이야기이다.
 
@@ -98,13 +98,8 @@ $$ c_{ij} = \Sigma^{n}_{k=1} a_{ik} b_{kj} $$
 
 그럼 이 하드웨어 스펙으로부터 뭘 알아 낼 수 있냐면, 이상적인 조건에서 달성 가능한 최대 성능을 계산해볼 수 있다. 특히 요즘 AI로 인해서 화두가 되고 있는 GFLOPS(기가플롭스; 초당 부동 소수점 연산의 수), 그 중에서도 이론적으로 가능한 Peak GFLOPS를 계산할 수 있다.
 
-$$
-\begin{align*}
-\text{Peak GFLOPS} &= \text{클럭 속도(Hz)} \times \text{물리 코어 수} \times \text{FLOP per cycle} \times \text{하이퍼스레딩 팩터} \\
- &= (2.9 \times 10^9) \times 2 \times 9 \times 16 \\
- &\approx 836 \text{GFLOPS}
-\end{align*}
-$$
+ * Peak GFLOPS = 클럭 속도 x 물리 코어 수 x 싸이클 당 부동 소수점 연산 수 x 하이퍼스레딩 팩터
+ * 이를 계산하면 $$ (2.9 \times 10^9) \times 2 \times 9 \times 16 $$로 대략 836 GFLOPS를 얻는다.
 
 여기서 하이퍼스레딩 팩터는 하이퍼스레딩 2 way와 8배의 배정밀도 부동소수점 연산 처리량을 모두 고려한 값이다. 클럭은 초당 사이클 수 이고, 8배의 연산 처리량은 코어마다 한 사이클에 최대 8개의 배정밀도 연산이 가능하다는 의미이니 8을 곱하는 데에는 의심의 여지가 없다. 다만 2-way 하이퍼스레딩이라서 2를 곱한 것은 조금 의문이 있다. 왜냐하면 2-way 하이퍼스레딩은 물리적으로 2개의 연산 유닛이 붙어 있다는 뜻이 아니라 두 개의 논리적인 쓰레드를 동시에 실행할 수 있다는 의미라서, Peak GFLOPS를 계산할 때는 물리 코어만 고려해야하지 않나 하는게 내 생각이다. 아주 이상적인 실행 환경에서는 2를 곱하는게 맞겠지만, 실제로는 달성 불가능하지 않을까. 아무튼 강의 슬라이드에서는 2를 곱한 이상적인 값을 기준으로 했으니 일단 여기서도 똑같이 하고자 한다.
 
