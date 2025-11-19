@@ -558,7 +558,7 @@ mm.c:42:7: remark: vectorized loop (vectorization width: 2, interleaved count: 2
  * 메모리 관리 최적화: 행렬 크기가 커지면 계산에 필요한 메모리 양도 많아지는데, 이를 효율적으로 처리하기 위해서 메모리 풀, 제자리 연산, 메모리를 페이지 경계에 정렬하기 등을 고려해볼 수 있다.
  * AVX Intrinsics를 적용해서 기저 조건 함수 개선: 기저 조건인 `mm_base`에서 단순한 반복문을 쓰는게 아니라 직접 AVX Intrinsics를 명시적으로 사용할 수 있다.
 
-특히 마지막 AVX Intrinsics은 256 비트의 벡터, 즉 4개의 배정밀도 부동 소수점 연산을 다음과 같이 한번에 처리할 수 있다.
+특히 마지막 AVX Intrinsics은 256 비트의 벡터, 즉 4개의 배정밀도 부동 소수점 연산을 다음과 같이 한번에 처리할 수 있다. (참고로 아래 코드는 n이 4의 배수일 때를 가정한 코드이다)
 
 ```c
 #include <immintrin.h>
@@ -570,20 +570,22 @@ void mm_base(
   int n) {
   for (int i = 0; i < n; i++) {
     for (int k = 0; k < n; k++) {
-      // A의 원소 4개 복제
-      __m256d a_val = _mm256_set1_pd(A[n_A * i + k]);
+      // A[i][k]를 브로드캐스트할 벡터 준비.
+      // 스칼라 값을 벡터 레지스터 4개 레인에 브로드캐스트 한다.
+      __m256d a_vec = _mm256_set1_pd(A[n_A * i + k]);
 
       for (int j = 0; j < n; j += 4) {
-        // B의 원소 4개 연속 로드
+        // B의 원소 4개 연속 로드.
+        // 정렬되지 않은 메모리에서, 4개의 배정밀도 부동 소수점으로 로드한다.
         __m256d b_vec = _mm256_loadu_pd(&B[n_B * k + j]);
 
-        // C의 원소 4개 연속 로드
+        // C의 원소 4개 연속 로드. 마찬가지.
         __m256d c_vec = _mm256_loadu_pd(&C[n_C * i + j]);
 
-        // C += A[i,k] * B[k, j:j+3] 계산
-        c_vec = _mm256_fmadd_pd(a_val, b_vec, c_vec);
+        // FMA 시도 - c_vec += (a_vec * b_vec)
+        c_vec = _mm256_fmadd_pd(a_vec, b_vec, c_vec);
 
-        // 결과 저장
+        // 결과 저장. 4개의 배정밀도 부동 소수점을 동시에 저장한다.
         _mm256_storeu_pd(&C[n_C * i + j], c_vec);
       }
     }
@@ -623,7 +625,7 @@ int main() {
         int tile_n = (tj + SIZE_TILING > SIZE_MATRIX) ? (SIZE_MATRIX - tj) : SIZE_TILING;
         int tile_k = (tk + SIZE_TILING > SIZE_MATRIX) ? (SIZE_MATRIX - tk) : SIZE_TILING;
         // 첫번째 반복일때만 0, 이후는 누적(1.0)
-        double beta_val = (tk == 0) ? 0.0 : 1.0;
+        double beta_vec = (tk == 0) ? 0.0 : 1.0;
 
         cblas_dgemm(
           CblasRowMajor,
@@ -637,7 +639,7 @@ int main() {
           SIZE_MATRIX,                // B의 leading dimension
           A + tk * SIZE_MATRIX + tj,  // A의 타일 시작 위치
           SIZE_MATRIX,                // A의 leading dimension
-          beta_val,
+          beta_vec,
           C + ti * SIZE_MATRIX + tj,  // C의 타일 시작 위치
           SIZE_MATRIX);               // C의 leading dimension
       }
