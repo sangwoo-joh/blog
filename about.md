@@ -5,26 +5,26 @@ permalink: /about/
 last_update: 2024-07-26 14:39:34
 ---
 
-## Myself
- - Applied PL Engineer
+응용 PL 엔지니어
 
-## Interests
- - Programming Languages and Type Theory
- - Engineering Leadership
- - Parallel & Asynchronous Programming
+## 관심사
+ - 프로그래밍 언어 이론, 타입 이론
+ - 가비지 컬렉션
+ - 병렬 및 비동기 프로그래밍
+ - 이맥스, OCaml, 파이썬, C
 
-## Mantra
+## 삶의 태도에 영감을 준 말들
 
-> We don't rise to the level of our expectations; we fall to the level of our training. - Archilochus
+> 우리는 기대치까지 도달하는 게 아니라, 훈련한 수준까지 내려간다. - 아르킬로코스 (Archilochus)
 
-> Plans are useless, but planning is indispensable. - Dwight Eisenhower
+> 계획은 쓸모없지만, 계획하는 과정은 반드시 필요하다. - 드와이트 아이젠하워 (Dwight Eisenhower)
 
-> Nothing in the world can take place of persistence. Talent will not; nothing is more common than unsuccessful men with talent. Genius will not; unrewarded genius is almost a proverb. Education will not; the world is full of educated derelicts. Persistence and determination alone are omnipotent. - Racy Kroc
+> 세상에 끈기를 대신할 수 있는 것은 아무것도 없다. 재능도 아니다; 재능이 있어도 실패하는 사람들이 얼마나 흔한가. 천재성도 소용없다; 보상받지 못한 천재는 거의 속담과 같다. 교육도 아니다; 세상은 교육받은 낙오자들로 가득하다. 오직 끈기와 결단력만이 전능하다. - 레이시 크록 (Racy Kroc)
 
-> The secret of life is to have a task, something you devote your entire life to, something you bring everything to, every minute of the day for your whole life. And the most important thing is - it must be sometihng you cannot possibly do! - Henry Moore
+> 인생의 비밀은 평생을 바칠 과업을 갖는 것이다. 온 삶을, 매 순간을 그 일에 쏟아붓는 것이다. 그리고 가장 중요한 것은, 그 과업은 결코 해낼 수 없을 것 같은 일이어야 한다. - 헨리 무어 (Henry Moore)
 
-## Works
- - [Book](/book)
- - [ocaml-ps](/ocaml-ps)
- - [`.dotfiles`](https://github.com/sangwoo-joh/.dotfiles)
- - [`.doom.d`](https://github.com/sangwoo-joh/.doom.d)
+## 작업들
+ - [ocaml-ps](/ocaml-ps): OCaml로 백준 문제 풀이
+ - [`.dotfiles`](https://github.com/sangwoo-joh/.dotfiles): 원 클릭 리눅스/맥 셋업
+ - [`.doom.d`](https://github.com/sangwoo-joh/.doom.d): 둠 이맥스 설정
+ - [Book](/book): 온갖 잡다한 글
