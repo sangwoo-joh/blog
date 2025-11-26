@@ -27,4 +27,4 @@ last_update: 2024-07-26 14:39:34
  - [ocaml-ps](/ocaml-ps): OCaml로 백준 문제 풀이
  - [`.dotfiles`](https://github.com/sangwoo-joh/.dotfiles): 원 클릭 리눅스/맥 셋업
  - [`.doom.d`](https://github.com/sangwoo-joh/.doom.d): 둠 이맥스 설정
- - [Book](/book): 온갖 잡다한 글
+ - [The Book](/the-book): 온갖 잡다한 글
