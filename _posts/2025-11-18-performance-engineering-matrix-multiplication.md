@@ -6,6 +6,12 @@ title: 성능 엔지니어링 - 행렬 곱셈 이야기
 last_update: 2025-11-20 22:19:30
 ---
 
+## 목차
+{:.no_toc}
+
+* Table of contents
+{:toc}
+
 발단: 평소처럼 재미있는 글이 없나 하고 [긱뉴스](https://news.hada.io/)를 탐방하다가 [컴파일러 엔지니어가 되는 법](https://rona.substack.com/p/becoming-a-compiler-engineer)이라는 글을 보게 되었다. 한국에서만 컴파일러 관련 포지션이 적은건가 싶었는데 미국도 상황은 비슷한가보구나, 라고 생각하면서 읽다가, 저자의 추천으로 MIT OCW의 [Performance Engineering](https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/) 강의를 만나게 되었다. 마침 최근 내 관심사와 맞닿아 있는 주제라서 강의 슬라이드를 보고 있는데 너무 재밌어서 내 식으로 소화도 할 겸 좀 정리해보려고 한다. 마침 [MIT OpenCourseWare 라이센스](https://ocw.mit.edu/pages/privacy-and-terms-of-use/)도 출처만 표기한다면 너그러운 편이다.
 
 [1강](https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/resources/lecture-1-introduction-and-matrix-multiplication/)은 성능 엔지니어링 전반에 대한 이야기를 시작으로, 행렬 곱셈을 어디까지 최적화할 수 있는지에 대한 이야기이다.
