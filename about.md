@@ -5,9 +5,9 @@ permalink: /about/
 last_update: 2024-07-26 14:39:34
 ---
 
-응용 PL 엔지니어.
+Applied PL Engineer
 
-이해한 글만 쓰려고 합니다.
+이해한 내용만 글로 쓰려고 노력함
 
 ## 관심사
  - 프로그래밍 언어 이론, 타입 이론
