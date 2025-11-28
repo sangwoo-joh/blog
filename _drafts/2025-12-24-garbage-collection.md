@@ -127,4 +127,6 @@ responsiveness, 반응성이 중요.
 
 참고 문헌
  - [Uniprocessor Garbage Collection Techniques](https://www.cs.cmu.edu/~fp/courses/15411-f08/misc/wilson94-gc.pdf) by Paul R. Wilson (CMU)
+ - [A Unified Theory of Garbage Collection](https://web.eecs.umich.edu/~weimerw/2008-415/reading/bacon-garbage.pdf) by David F. Bacon et. al (IBM Watson)
+ - [Memory Management](https://signalsandthreads.com/memory-management/) with Stephen Dolan (Jane Street)
  - [OCaml 4.14.2](https://github.com/ocaml/ocaml/tree/4.14) Source Code
