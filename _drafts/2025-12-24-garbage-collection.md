@@ -76,13 +76,16 @@ title: 가비지 컬렉션 이야기
 
 ## Mark-Sweep Collection
 
-## Mark-Compact Collection
+## Mark-Sweep-Compact Collection
 
 ## Copying Collection
 
+## STW (Stop-The-World) Coordination
+결국 트레이싱 컬렉션도 색깔을 칠하는 작업을 해야하기 때문에 오브젝트에 값을 써야하는데, 이로 인해 레퍼런스 카운팅과 마찬가지로 멀티 프로세스/쓰레드 환경에서 동기화가 필수적이다. 그래서 OCaml도 파이썬과 마찬가지로 GIL이 존재**했다**.
+
 ## Incremental Collection
 
-## Generational Hypothesis
+## Generational Collection
 세대 가설 - 대부분의 데이터는 빨리 죽는다 (Die Young). 이로 인해서 말 그대로 여러 개의 힙을 운영하는 것이 가능해진다. 그래서 보통은 두 개의 힙을 운영한다.
 
 ### Minor Heap
@@ -91,8 +94,7 @@ Youngest Heap, Bump Pointer Collection
 ### Major Heap
 Old Heap, Mark & Sweep Collection
 
-## STW (Stop-The-World) Coordination
-결국 트레이싱 컬렉션도 색깔을 칠하는 작업을 해야하기 때문에 오브젝트에 값을 써야하는데, 이로 인해 레퍼런스 카운팅과 마찬가지로 멀티 프로세스/쓰레드 환경에서 동기화가 필수적이다. 그래서 OCaml도 파이썬과 마찬가지로 GIL이 존재**했다**.
+## OCaml 4.x의 경우
 
 ### Snapshot Invariant
 마크 앤 스윕의 알고리즘 특성 상, **가비지 (즉 Unreachable Objects)의 수는 절대로 줄어들지 않는다**. 그래서 컬렉션 (정확히는 마킹) 을 시작하는 순간 현재 오브젝트들의 상태의 스냅샷(즉 주소 값들)을 복사해서 가지고 있으면서, 얘네들을 따라가서 가비지인지 여부를 확인한다. 이렇게 하면 **반드시 마킹 작업이 끝난다**는 것을 보장할 수 있는데, 컬렉션이 동작하는 도중에 힙에 오브젝트들이 계속 생기면, 이로 인해서 컬렉션이 늘어지거나 끝나지 않을 수 있기 때문이다. 그래서 보통은 이렇게 컬렉션이 시작하는 시점의 스냅샷만을 기준으로 GC가 동작한다.
