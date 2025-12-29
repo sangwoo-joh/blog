@@ -67,7 +67,7 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
     print("> Stats of posts")
     print(df.describe())
     print(f"> Median: {df['characters'].median()}")
-    print(f"> Lognest post: {post_max}")
+    print(f"> Longest post: {post_max}")
     print(f"> Shortest post: {post_min}")
 
     if output_plot:
