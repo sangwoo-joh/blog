@@ -3,9 +3,10 @@ import os
 import pandas as pd
 import click
 import time
+from typing import List, Tuple
 
 
-def load(filename):
+def load(filename: str) -> Tuple[str, str]:
     with open(filename, 'r') as fp:
         content = fp.read()
 
@@ -16,7 +17,7 @@ def load(filename):
     content = content.strip()
     return title, content
 
-def load_all(dir, exclude):
+def load_all(dir: str, exclude: List[str]) -> List[str]:
     paths = os.walk(dir, followlinks=False)
     files = []
     for path in paths:
@@ -46,7 +47,7 @@ def load_all(dir, exclude):
     type=click.Path(exists=True, resolve_path=True, file_okay=False),
     help="Directory to write histogram plot. Figure file name will be hist-{now}.svg.",
 )
-def stat(dir, exclude, output_plot):
+def main(dir: str, exclude: List[str], output_plot: str) -> None:
     contents = load_all(dir, exclude)
     now = time.strftime("%Y-%m-%d")
     print(f"> Statistics of {now}")
@@ -68,4 +69,4 @@ def stat(dir, exclude, output_plot):
         print(f"> Saved figure in {fig_name}")
 
 if __name__ == '__main__':
-    stat()
+    main()
