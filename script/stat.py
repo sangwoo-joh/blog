@@ -54,6 +54,7 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
 
     post_dir = os.path.join(os.path.dirname(HERE), "_posts")
     post_paths = load_post_paths(post_dir, exclude)
+    post_paths = [p for p in post_paths if os.path.basename(p)[:4] == year]
     contents = [*map(load_content, post_paths)]
 
     df = pd.DataFrame(data=contents, columns=['title', 'content'])
