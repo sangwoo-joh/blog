@@ -94,10 +94,12 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
 
+        from matplotlib.ticker import MaxNLocator
         fig_monthly = os.path.join(output_plot, f"monthly-hist-{year}.svg")
         ax = monthly_counts.plot.bar(figsize=(12, 6))
         ax.set_xlabel('Month')
         ax.set_ylabel('# of posts')
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.set_title(f"Post per month in {year}")
         ax.figure.tight_layout()
         ax.figure.savefig(fig_monthly)
