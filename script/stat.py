@@ -89,12 +89,18 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
     print(f"> Shortest post: {post_min}")
 
     if output_plot:
+        from matplotlib.ticker import MaxNLocator
+
         fig_name = os.path.join(output_plot, f'hist-{year}.svg')
         fig = df['characters'].plot.hist(bins=100)
+        fig.set_xlabel('Characters')
+        fig.set_ylabel('# of posts')
+        fig.yaxis.set_major_locator(MaxNLocator(integer=True))
+        fig.set_title(f'Characters per post in {year}')
+        fig.figure.tight_layout()
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
 
-        from matplotlib.ticker import MaxNLocator
         fig_monthly = os.path.join(output_plot, f"monthly-hist-{year}.svg")
         ax = monthly_counts.plot.bar(figsize=(12, 6))
         ax.set_xlabel('Month')
