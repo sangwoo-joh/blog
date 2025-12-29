@@ -53,7 +53,7 @@ def main(exclude: List[str], output_plot: str) -> None:
     contents = [*map(load_content, post_paths)]
     print(f"> Total {len(contents)} posts")
     df = pd.DataFrame(data=contents, columns=['title', 'content'])
-    df['words'] = df.apply(lambda row: len(row['content']), axis=1)
+    df['words'] = df.apply(lambda row: len(row['content'].split()), axis=1)
     print("> Stats of posts")
     print(df.describe())
     print(f"> Median: {df['words'].median()}")
