@@ -63,11 +63,12 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
 
     post_dir = os.path.join(os.path.dirname(HERE), "_posts")
     post_paths = load_post_paths(post_dir, exclude)
-    if year != 'all':
-        post_paths = [p for p in post_paths if os.path.basename(p)[:4] == year]
     contents = [*map(load_content, post_paths)]
 
     df = pd.DataFrame(data=contents, columns=['title', 'content', 'year', 'month', 'characters'])
+    # filter year
+    if year != 'all':
+        df = df[df['year'] == year]
     post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
     post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
 
