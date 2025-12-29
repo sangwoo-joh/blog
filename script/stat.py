@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 HERE = os.path.dirname(__file__)
 
-def load(filename: str) -> Tuple[str, str]:
+def load_content(filename: str) -> Tuple[str, str]:
     with open(filename, 'r') as fp:
         content = fp.read()
 
@@ -33,7 +33,7 @@ def load_all(dir: str, exclude: List[str]) -> List[str]:
 
     # filter only markdown
     files = [file for file in files if os.path.splitext(file)[-1].lower() == '.md']
-    return [*map(load, files)]
+    return [*map(load_content, files)]
 
 @click.command()
 @click.option(
