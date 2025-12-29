@@ -5,6 +5,7 @@ import click
 import time
 from typing import List, Tuple
 
+HERE = os.path.dirname(__file__)
 
 def load(filename: str) -> Tuple[str, str]:
     with open(filename, 'r') as fp:
@@ -35,7 +36,6 @@ def load_all(dir: str, exclude: List[str]) -> List[str]:
     return [*map(load, files)]
 
 @click.command()
-@click.argument('dir', type=click.Path(exists=True, resolve_path=True, file_okay=False))
 @click.option(
     '--exclude', '-e',
     type=click.Path(exists=True, resolve_path=True, dir_okay=False),
@@ -47,8 +47,9 @@ def load_all(dir: str, exclude: List[str]) -> List[str]:
     type=click.Path(exists=True, resolve_path=True, file_okay=False),
     help="Directory to write histogram plot. Figure file name will be hist-{now}.svg.",
 )
-def main(dir: str, exclude: List[str], output_plot: str) -> None:
-    contents = load_all(dir, exclude)
+def main(exclude: List[str], output_plot: str) -> None:
+    post_dir = os.path.join(os.path.dirname(HERE), "_posts")
+    contents = load_all(post_dir, exclude)
     now = time.strftime("%Y-%m-%d")
     print(f"> Statistics of {now}")
     print(f"> Total {len(contents)} posts")
