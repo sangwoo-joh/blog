@@ -7,6 +7,13 @@ from typing import List, Tuple
 
 HERE = os.path.dirname(__file__)
 
+def extract_date(filepath: str) -> str:
+    basename = os.path.basename(filepath)
+    match = re.match(r'^(\d{4})-(\d{2})-(\d{2})', basename)
+    if match:
+        return match.group(1), match.group(2), match.group(3)
+    return None, None, None
+
 def load_content(filepath: str) -> Tuple[str, str]:
     with open(filepath, 'r') as fp:
         content = fp.read()
