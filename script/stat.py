@@ -34,6 +34,11 @@ def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
 
 @click.command()
 @click.option(
+    '--year', '-y',
+    default=time.strftime("%Y"),
+    help="Filter by year. Default is the current year.",
+)
+@click.option(
     '--exclude', '-e',
     type=click.Path(exists=True, resolve_path=True, dir_okay=False),
     multiple=True,
@@ -44,11 +49,10 @@ def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
     type=click.Path(exists=True, resolve_path=True, file_okay=False),
     help="Directory to write histogram plot. Figure file name will be hist-{now}.svg.",
 )
-def main(exclude: List[str], output_plot: str) -> None:
-    post_dir = os.path.join(os.path.dirname(HERE), "_posts")
-    this_year = time.strftime("%Y")
-    print(f"> Statistics of {this_year}")
+def main(year: str, exclude: List[str], output_plot: str) -> None:
+    print(f"> Statistics of {year}")
 
+    post_dir = os.path.join(os.path.dirname(HERE), "_posts")
     post_paths = load_post_paths(post_dir, exclude)
     contents = [*map(load_content, post_paths)]
     print(f"> Total {len(contents)} posts")
@@ -63,7 +67,7 @@ def main(exclude: List[str], output_plot: str) -> None:
     print(f"> Shortest post: {post_min}")
 
     if output_plot:
-        fig_name = os.path.join(output_plot, f'hist-{this_year}.svg')
+        fig_name = os.path.join(output_plot, f'hist-{year}.svg')
         fig = df.plot.hist(bins=100)
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
