@@ -63,7 +63,7 @@ def main(exclude: List[str], output_plot: str) -> None:
     print(f"> Shortest post: {post_min}")
 
     if output_plot:
-        fig_name = os.path.join(output_plot, f'hist-{now}.svg')
+        fig_name = os.path.join(output_plot, f'hist-{this_year}.svg')
         fig = df.plot.hist(bins=100)
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
