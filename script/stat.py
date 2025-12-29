@@ -7,8 +7,8 @@ from typing import List, Tuple
 
 HERE = os.path.dirname(__file__)
 
-def load_content(filename: str) -> Tuple[str, str]:
-    with open(filename, 'r') as fp:
+def load_content(filepath: str) -> Tuple[str, str]:
+    with open(filepath, 'r') as fp:
         content = fp.read()
 
     title = re.search(r"^title: (.+)$", content, re.MULTILINE)[1]
