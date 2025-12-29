@@ -59,14 +59,14 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
     contents = [*map(load_content, post_paths)]
 
     df = pd.DataFrame(data=contents, columns=['title', 'content'])
-    df['words'] = df.apply(lambda row: len(row['content'].split()), axis=1)
-    post_max = df[df['words'] == df['words'].max()].iloc[0]['title']
-    post_min = df[df['words'] == df['words'].min()].iloc[0]['title']
+    df['characters'] = df.apply(lambda row: len(row['content']), axis=1)
+    post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
+    post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
 
     print(f"> Total {len(contents)} posts")
     print("> Stats of posts")
     print(df.describe())
-    print(f"> Median: {df['words'].median()}")
+    print(f"> Median: {df['characters'].median()}")
     print(f"> Lognest post: {post_max}")
     print(f"> Shortest post: {post_min}")
 
