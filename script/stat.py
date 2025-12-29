@@ -71,11 +71,13 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
         df = df[df['year'] == year]
     post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
     post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
+    monthly_counts = df['month'].value_counts().sort_index()
 
     print(f"> Total {len(contents)} posts")
     print("> Stats of posts")
     print(df.describe())
     print(f"> Median: {df['characters'].median()}")
+    print(f"> Post per month: {monthly_counts}")
     print(f"> Longest post: {post_max}")
     print(f"> Shortest post: {post_min}")
 
@@ -84,6 +86,19 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
         fig = df.plot.hist(bins=100)
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
+
+        import matplotlib.pyplot as plt
+
+        fig_monthly = os.path.join(output_plot, f"monthly-hist-{year}.svg")
+        ax = monthly_counts.plot.bar(figsize=(12, 6))
+        ax.set_xlabel('Month')
+        ax.set_ylabel('# of posts')
+        ax.set_title(f"Post per month in {year}")
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+        plt.savefig(fig_monthly)
+        plt.close()
+        print(f"> Saved monthly figure in {fig_monthly}")
 
 if __name__ == '__main__':
     main()
