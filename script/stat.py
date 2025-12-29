@@ -36,7 +36,7 @@ def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
 @click.option(
     '--year', '-y',
     default=time.strftime("%Y"),
-    help="Filter by year. Default is the current year.",
+    help="Filter by year. Default is the current year. Set \"all\" if you want to see statistic for all posts.",
 )
 @click.option(
     '--exclude', '-e',
@@ -54,7 +54,8 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
 
     post_dir = os.path.join(os.path.dirname(HERE), "_posts")
     post_paths = load_post_paths(post_dir, exclude)
-    post_paths = [p for p in post_paths if os.path.basename(p)[:4] == year]
+    if year != 'all':
+        post_paths = [p for p in post_paths if os.path.basename(p)[:4] == year]
     contents = [*map(load_content, post_paths)]
 
     df = pd.DataFrame(data=contents, columns=['title', 'content'])
