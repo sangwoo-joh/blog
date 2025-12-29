@@ -72,12 +72,14 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
     post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
     post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
     monthly_counts = df['month'].value_counts().sort_index()
+    all_month = pd.Series(range(1, 13))
+    monthly_counts = monthly_counts.reindex(all_month, fill_value=0).sort_index()
 
     print(f"> Total {len(contents)} posts")
     print("> Stats of posts")
     print(df.describe())
     print(f"> Median: {df['characters'].median()}")
-    print(f"> Post per month: {monthly_counts}")
+    print(f"> Post per month: \n{monthly_counts}")
     print(f"> Longest post: {post_max}")
     print(f"> Shortest post: {post_min}")
 
