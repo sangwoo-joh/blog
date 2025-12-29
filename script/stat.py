@@ -24,7 +24,8 @@ def load_content(filepath: str) -> Tuple[str, str]:
     closing = content.find('---', opening + 1)
     content = content[closing + len('---'):]
     content = content.strip()
-    return title, content, year, month
+    characters = len(content)
+    return title, content, year, month, characters
 
 def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
     paths = os.walk(dir, followlinks=False)
@@ -66,8 +67,7 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
         post_paths = [p for p in post_paths if os.path.basename(p)[:4] == year]
     contents = [*map(load_content, post_paths)]
 
-    df = pd.DataFrame(data=contents, columns=['title', 'content', 'year', 'month'])
-    df['characters'] = df.apply(lambda row: len(row['content']), axis=1)
+    df = pd.DataFrame(data=contents, columns=['title', 'content', 'year', 'month', 'characters'])
     post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
     post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
 
