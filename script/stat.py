@@ -18,7 +18,7 @@ def load_content(filename: str) -> Tuple[str, str]:
     content = content.strip()
     return title, content
 
-def load_all(dir: str, exclude: List[str]) -> List[str]:
+def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
     paths = os.walk(dir, followlinks=False)
     files = []
     for path in paths:
@@ -30,8 +30,7 @@ def load_all(dir: str, exclude: List[str]) -> List[str]:
                 file not in exclude and  # filter excludes
                 os.path.splitext(file)[-1].lower() == '.md')  # markdown
 
-    files = [file for file in files if filtering(file)]
-    return [*map(load_content, files)]
+    return [file for file in files if filtering(file)]
 
 @click.command()
 @click.option(
@@ -47,9 +46,11 @@ def load_all(dir: str, exclude: List[str]) -> List[str]:
 )
 def main(exclude: List[str], output_plot: str) -> None:
     post_dir = os.path.join(os.path.dirname(HERE), "_posts")
-    contents = load_all(post_dir, exclude)
-    now = time.strftime("%Y-%m-%d")
-    print(f"> Statistics of {now}")
+    this_year = time.strftime("%Y")
+    print(f"> Statistics of {this_year}")
+
+    post_paths = load_post_paths(post_dir, exclude)
+    contents = [*map(load_content, post_paths)]
     print(f"> Total {len(contents)} posts")
     df = pd.DataFrame(data=contents, columns=['title', 'content'])
     df['words'] = df.apply(lambda row: len(row['content']), axis=1)
