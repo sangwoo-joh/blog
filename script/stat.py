@@ -7,14 +7,14 @@ from typing import List, Tuple
 
 HERE = os.path.dirname(__file__)
 
-def extract_date(filepath: str) -> str:
+def extract_date(filepath: str) -> Tuple[str, int, int]:
     basename = os.path.basename(filepath)
     match = re.match(r'^(\d{4})-(\d{2})-(\d{2})', basename)
     if match:
-        return match.group(1), match.group(2), match.group(3)
+        return match.group(1), int(match.group(2)), int(match.group(3))
     return None, None, None
 
-def load_content(filepath: str) -> Tuple[str, str]:
+def load_content(filepath: str) -> Tuple[str, str, str, int, int]:
     with open(filepath, 'r') as fp:
         content = fp.read()
 
@@ -69,15 +69,20 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
     # filter year
     if year != 'all':
         df = df[df['year'] == year]
+
+    if df.empty:
+        print("> Filtered result is empty.")
+        return
+
     post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
     post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
     monthly_counts = df['month'].value_counts().sort_index()
     all_month = pd.Series(range(1, 13))
     monthly_counts = monthly_counts.reindex(all_month, fill_value=0).sort_index()
 
-    print(f"> Total {len(contents)} posts")
+    print(f"> Total {len(df)} posts")
     print("> Stats of posts")
-    print(df.describe())
+    print(df['characters'].describe())
     print(f"> Median: {df['characters'].median()}")
     print(f"> Post per month: \n{monthly_counts}")
     print(f"> Longest post: {post_max}")
@@ -85,7 +90,7 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
 
     if output_plot:
         fig_name = os.path.join(output_plot, f'hist-{year}.svg')
-        fig = df.plot.hist(bins=100)
+        fig = df['characters'].plot.hist(bins=100)
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
 
