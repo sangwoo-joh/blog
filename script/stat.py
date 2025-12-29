@@ -87,17 +87,13 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
         fig.figure.savefig(fig_name)
         print(f"> Saved figure in {fig_name}")
 
-        import matplotlib.pyplot as plt
-
         fig_monthly = os.path.join(output_plot, f"monthly-hist-{year}.svg")
         ax = monthly_counts.plot.bar(figsize=(12, 6))
         ax.set_xlabel('Month')
         ax.set_ylabel('# of posts')
         ax.set_title(f"Post per month in {year}")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.savefig(fig_monthly)
-        plt.close()
+        ax.figure.tight_layout()
+        ax.figure.savefig(fig_monthly)
         print(f"> Saved monthly figure in {fig_monthly}")
 
 if __name__ == '__main__':
