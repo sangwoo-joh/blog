@@ -25,14 +25,12 @@ def load_all(dir: str, exclude: List[str]) -> List[str]:
         for filename in path[2]:
             files.append(os.path.join(path[0], filename))
 
-    # only hard links
-    files = [file for file in files if not os.path.islink(file)]
+    def filtering(file: str) -> bool:
+        return (not os.path.islink(file) and  # only hard links
+                file not in exclude and  # filter excludes
+                os.path.splitext(file)[-1].lower() == '.md')  # markdown
 
-    # filter exclude
-    files = [file for file in files if file not in exclude]
-
-    # filter only markdown
-    files = [file for file in files if os.path.splitext(file)[-1].lower() == '.md']
+    files = [file for file in files if filtering(file)]
     return [*map(load_content, files)]
 
 @click.command()
