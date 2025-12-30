@@ -6,23 +6,23 @@ layout: default
 <br />
 태그 목록: <span class="tag" data-tag="all">전체</span>
 {% for tag in site.data.tags %}
-<span class="tag" data-tag="{{tag}}">
-  {{ tag }}
-</span>
+  <span class="tag" data-tag="{{tag}}">
+    {{ tag }}
+  </span>
 {% endfor %}
-
 
 <hr />
 
 [<span class="count"></span>]
 
 {% for post in site.posts %}
-{% assign postyear = post.date | date: "%Y" %}
-{% if year != postyear %}
-{% unless forloop.first %}</ul>{% endunless %}
-<h2>{{ postyear }}</h2>
-<ul class="post-list" >
-  {% assign year = postyear %}
+  {% assign postyear = post.date | date: "%Y" %}
+  {% if year != postyear %}
+    {% unless forloop.first %}</ul></div>{% endunless %}
+    <div class="year-group" data-year="{{ postyear }}">
+      <h2>{{ postyear }}</h2>
+      <ul class="post-list" >
+        {% assign year = postyear %}
   {% endif %}
   {% assign post_date = post.date | date: site.theme_config.date_format %}
   <div class="post-preview"
@@ -34,7 +34,7 @@ layout: default
       <div class="post-link"><a href="{{ post.url | relative_url }}">{{ post.title | downcase }}</a></div>
     </li>
   </div>
-  {% if forloop.last %}</ul>{% endif %}
+  {% if forloop.last %}</ul></div>{% endif %}
 {% endfor %}
 
 <hr />
@@ -67,7 +67,6 @@ layout: default
   function getQuery() {
     var params = {};
     window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str, key, value) {
-
       params[key] = value;
     });
 
@@ -89,6 +88,13 @@ layout: default
         $(elem).addClass('hidden');
       } else {
         counter += 1;
+      }
+    });
+
+    $('.year-group').each((index, yearGroup) => {
+      const visiblePosts = $(yearGroup).find('.post-preview:not(.hidden)').length;
+      if (visiblePosts === 0) {
+        $(yearGroup).addClass('hidden');
       }
     });
 
