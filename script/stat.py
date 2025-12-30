@@ -14,18 +14,19 @@ def extract_date(filepath: str) -> Tuple[str, int, int]:
         return match.group(1), int(match.group(2)), int(match.group(3))
     return None, None, None
 
-def load_content(filepath: str) -> Tuple[str, str, str, int, int]:
+def load_content(filepath: str) -> Tuple[str, str, str, int, int, int]:
     with open(filepath, 'r') as fp:
         content = fp.read()
 
     title = re.search(r"^title: (.+)$", content, re.MULTILINE)[1]
     year, month, _day = extract_date(filepath)
+    quarter = (month - 1) // 3 + 1
     opening = content.find('---')
     closing = content.find('---', opening + 1)
     content = content[closing + len('---'):]
     content = content.strip()
     characters = len(content)
-    return title, content, year, month, characters
+    return title, content, year, month, characters, quarter
 
 def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
     paths = os.walk(dir, followlinks=False)
@@ -68,8 +69,22 @@ def write_plots(output_path: str, df: pd.DataFrame, year: str):
     ax.set_title(f"Post per month in {year}")
     ax.figure.tight_layout()
     ax.figure.savefig(fig_monthly)
-    print(f"> Post per month: \n{monthly_counts}")
+    print(f"> Post per month:\n{monthly_counts}")
     print(f"> Saved monthly figure in {fig_monthly}")
+
+    quarterly_counts = df['quarter'].value_counts().sort_index()
+    all_quarters = pd.Series(range(1, 5))
+    quarterly_counts = quarterly_counts.reindex(all_quarters, fill_value=0).sort_index()
+    fig_quarterly = os.path.join(output_path, f"quarterly-hist-{year}.svg")
+    qx = quarterly_counts.plot.bar(figsize=(4, 6))
+    qx.set_xlabel('Quarter')
+    qx.set_ylabel('# of posts')
+    qx.yaxis.set_major_locator(MaxNLocator(integer=True))
+    qx.set_title(f"Post per quarter in {year}")
+    qx.figure.tight_layout()
+    qx.figure.savefig(fig_quarterly)
+    print(f"> Post per quarter:\n{quarterly_counts}")
+    print(f"> Saved quarterly figure in {fig_quarterly}")
 
 @click.command()
 @click.option(
@@ -95,7 +110,7 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
     post_paths = load_post_paths(post_dir, exclude)
     contents = [*map(load_content, post_paths)]
 
-    df = pd.DataFrame(data=contents, columns=['title', 'content', 'year', 'month', 'characters'])
+    df = pd.DataFrame(data=contents, columns=['title', 'content', 'year', 'month', 'characters', 'quarter'])
     # filter year
     if year != 'all':
         df = df[df['year'] == year]
