@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [life, essay]
+tag: [cs]
 title: 함께 자라기
 ---
 

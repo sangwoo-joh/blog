@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [dev]
+tags: [cs, life]
 published: true
 title: Emacs Native Compliation
 subtitle: Official!

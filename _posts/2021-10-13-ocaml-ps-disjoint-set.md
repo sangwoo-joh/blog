@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [dev, ocaml]
+tags: [ocaml]
 published: true
 title: OCaml로 PS 하기 -6-
 subtitle: 서로소 집합

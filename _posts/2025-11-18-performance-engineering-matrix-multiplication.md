@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [dev, performance]
+tag: [cs, essay]
 title: 성능 엔지니어링 - 행렬 곱셈 이야기
 last_update: 2025-11-20 22:19:30
 ---

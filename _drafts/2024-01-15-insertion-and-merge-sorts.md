@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Insertion and Merge Sorts
-tags: [dev, essay]
+tags: [cs]
 last_update: 2024-01-15 18:10:49
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [life, essay]
+tag: [other]
 title: 바람의 나라
 ---
 

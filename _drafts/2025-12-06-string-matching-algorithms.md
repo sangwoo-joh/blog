@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [dev, essay]
+tag: [cs]
 title: KMP 이야기
 ---
 

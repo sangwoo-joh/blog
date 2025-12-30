@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [dev, python]
+tags: [cs]
 published: true
 title: 파이썬 데코레이터
 ---

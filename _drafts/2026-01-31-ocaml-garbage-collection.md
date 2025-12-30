@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [dev, ocaml, essay]
+tag: [ocaml, essay]
 title: OCaml의 가비지 컬렉션 이야기
 ---
 

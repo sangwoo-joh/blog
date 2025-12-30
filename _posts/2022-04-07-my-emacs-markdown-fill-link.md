@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [dev]
+tags: [cs, life]
 published: true
 title: 나의 Emacs 마크다운 링크 입력기
 ---

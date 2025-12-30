@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [dev, essay]
+tag: [cs, life]
 title: 나의 LLM 사용기
 ---
 

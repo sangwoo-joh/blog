@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [dev]
+tags: [other]
 title: 블로그 새 단장
 subtitle: "I Know CSS"
 last_update: 2022-12-08 16:51:08

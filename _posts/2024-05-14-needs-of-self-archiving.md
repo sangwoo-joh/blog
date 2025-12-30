@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [dev, life]
+tags: [idea]
 title: 나만의 아카이빙이 필요하다
 ---
 

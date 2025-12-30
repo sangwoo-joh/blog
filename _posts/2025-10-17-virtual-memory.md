@@ -1,7 +1,7 @@
 ---
 layout: post
 title: 가상 메모리 이야기
-tags: [dev, essay]
+tags: [cs, essay]
 last_update: 2025-10-31 14:19:56
 ---
 

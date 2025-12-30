@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [dev]
+tags: [cs]
 title: 세그먼트 트리
 subtitle: 자료 구조란 어려워
 published: true

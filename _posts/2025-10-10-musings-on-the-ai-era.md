@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [dev, essay]
+tag: [cs, idea]
 title: AI 시대 단상
 ---
 

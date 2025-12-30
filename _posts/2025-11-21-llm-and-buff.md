@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [essay]
+tag: [idea]
 title: LLM과 버프
 ---
 

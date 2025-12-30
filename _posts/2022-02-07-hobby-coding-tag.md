@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [dev, life]
+tags: [other]
 published: true
 title: 태그 추가
 ---

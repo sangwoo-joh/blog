@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [life, essay]
+tag: [life]
 title: 영어 에피소드들
 ---
 

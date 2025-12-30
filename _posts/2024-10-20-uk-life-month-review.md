@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [life, essay]
+tag: [life]
 title: 영국 생활 한달 소회
 last_update: 2025-09-03 09:10:00
 ---

@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [life, essay]
+tag: [life]
 title: 21세기 의료 경험
 ---
 

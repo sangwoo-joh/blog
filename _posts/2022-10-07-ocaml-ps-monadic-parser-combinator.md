@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [dev, ocaml]
+tags: [ocaml]
 title: OCaml로 PS 하기 -7-
 subtitle: 파서 컴비네이터
 last_update: 2022-12-20 16:09:48

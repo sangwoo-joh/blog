@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [dev, essay]
+tag: [cs, essay]
 title: 가비지 컬렉션 이야기
 ---
 
