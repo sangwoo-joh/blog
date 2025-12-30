@@ -41,6 +41,36 @@ def load_post_paths(dir: str, exclude: List[str]) -> List[str]:
 
     return [file for file in files if filtering(file)]
 
+def write_plots(output_path: str, df: pd.DataFrame, year: str):
+    if not output_path:
+        return
+    from matplotlib.ticker import MaxNLocator
+
+    fig_name = os.path.join(output_path, f'hist-{year}.svg')
+    fig = df['characters'].plot.hist(bins=100)
+    fig.set_xlabel('Characters')
+    fig.set_ylabel('# of posts')
+    fig.yaxis.set_major_locator(MaxNLocator(integer=True))
+    fig.set_title(f'Characters per post in {year}')
+    fig.figure.tight_layout()
+    fig.figure.savefig(fig_name)
+    print(f"> Saved figure in {fig_name}")
+
+    monthly_counts = df['month'].value_counts().sort_index()
+    all_month = pd.Series(range(1, 13))
+    monthly_counts = monthly_counts.reindex(all_month, fill_value=0).sort_index()
+
+    fig_monthly = os.path.join(output_path, f"monthly-hist-{year}.svg")
+    ax = monthly_counts.plot.bar(figsize=(12, 6))
+    ax.set_xlabel('Month')
+    ax.set_ylabel('# of posts')
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_title(f"Post per month in {year}")
+    ax.figure.tight_layout()
+    ax.figure.savefig(fig_monthly)
+    print(f"> Post per month: \n{monthly_counts}")
+    print(f"> Saved monthly figure in {fig_monthly}")
+
 @click.command()
 @click.option(
     '--year', '-y',
@@ -76,40 +106,16 @@ def main(year: str, exclude: List[str], output_plot: str) -> None:
 
     post_max = df[df['characters'] == df['characters'].max()].iloc[0]['title']
     post_min = df[df['characters'] == df['characters'].min()].iloc[0]['title']
-    monthly_counts = df['month'].value_counts().sort_index()
-    all_month = pd.Series(range(1, 13))
-    monthly_counts = monthly_counts.reindex(all_month, fill_value=0).sort_index()
 
     print(f"> Total {len(df)} posts")
     print("> Stats of posts")
     print(df['characters'].describe())
     print(f"> Median: {df['characters'].median()}")
-    print(f"> Post per month: \n{monthly_counts}")
     print(f"> Longest post: {post_max}")
     print(f"> Shortest post: {post_min}")
 
-    if output_plot:
-        from matplotlib.ticker import MaxNLocator
+    write_plots(output_plot, df, year)
 
-        fig_name = os.path.join(output_plot, f'hist-{year}.svg')
-        fig = df['characters'].plot.hist(bins=100)
-        fig.set_xlabel('Characters')
-        fig.set_ylabel('# of posts')
-        fig.yaxis.set_major_locator(MaxNLocator(integer=True))
-        fig.set_title(f'Characters per post in {year}')
-        fig.figure.tight_layout()
-        fig.figure.savefig(fig_name)
-        print(f"> Saved figure in {fig_name}")
-
-        fig_monthly = os.path.join(output_plot, f"monthly-hist-{year}.svg")
-        ax = monthly_counts.plot.bar(figsize=(12, 6))
-        ax.set_xlabel('Month')
-        ax.set_ylabel('# of posts')
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_title(f"Post per month in {year}")
-        ax.figure.tight_layout()
-        ax.figure.savefig(fig_monthly)
-        print(f"> Saved monthly figure in {fig_monthly}")
 
 if __name__ == '__main__':
     main()
