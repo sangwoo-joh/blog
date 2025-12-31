@@ -5,15 +5,17 @@ permalink: /about/
 last_update: 2024-07-26 14:39:34
 ---
 
-Applied PL Engineer
+소프트웨어 엔지니어.
 
-이해한 내용만 글로 쓰려고 노력함
+스스로 이해한 내용만 남기려고 합니다.
 
-## 관심사
- - 프로그래밍 언어 이론, 타입 이론
- - 가비지 컬렉션
- - 병렬 및 비동기 프로그래밍
- - 이맥스, OCaml, 파이썬, C
+이야기 나누는 걸 좋아합니다.
+
+## 관심 갖고 있는 주제
+ * 프로그래밍 언어 이론, 타입 이론
+ * 메모리 시스템, 가비지 컬렉션
+ * 병렬/비동기 프로그래밍
+ * Emacs, OCaml, Python, C
 
 ## 삶의 태도에 영감을 준 말들
 
@@ -26,7 +28,7 @@ Applied PL Engineer
 > 인생의 비밀은 평생을 바칠 과업을 갖는 것이다. 온 삶을, 매 순간을 그 일에 쏟아붓는 것이다. 그리고 가장 중요한 것은, 그 과업은 결코 해낼 수 없을 것 같은 일이어야 한다. - 헨리 무어 (Henry Moore)
 
 ## 작업들
- - [ocaml-ps](/ocaml-ps): OCaml로 백준 문제 풀이
- - [`.dotfiles`](https://github.com/sangwoo-joh/.dotfiles): 원 클릭 리눅스/맥 셋업
- - [`.doom.d`](https://github.com/sangwoo-joh/.doom.d): 둠 이맥스 설정
- - [The Book](/the-book): 온갖 잡다한 글
+ * [`.doom.d`](https://github.com/sangwoo-joh/.doom.d): 둠 이맥스 설정
+ * [`.dotfiles`](https://github.com/sangwoo-joh/.dotfiles): 원 클릭 리눅스/맥 셋업
+ * [The Book](/the-book): 온갖 잡다한 글
+ * [ocaml-ps](/ocaml-ps): OCaml로 백준 문제 풀이
