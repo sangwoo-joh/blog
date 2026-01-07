@@ -32,9 +32,7 @@ title: 가비지 컬렉션 이야기
 
 ## 과거와 지금
 
-먼저 역사적인 배경을 한번 살펴보자. 최초의 가비지 컬렉션이 LISP 언어에 도입된 이유 중 하나는, 당시 메이저 언어 였던 ALGOL 언어에서 댕글링 포인터 문제, 그러니까 쓰던 메모리를 이미 해제했는데 그걸 모른채로 프로그램의 다른 부분에서 해제된 메모리 주소를 계속 갖고 있다가 사용해버리는 심각한 버그가 큰 이슈였다 (Use After Free). 그 당시 프로그래머라면 정말 똑똑한 소수의 선택된 사람들일텐데, 그런 친구들에게도 수동으로 메모리를 관리하는 일은 쉽지 않았던 것이다.[^1]
-
-[^1]: 물론 최초의 가비지 컬렉션은 여러가지 한계로 인해 "너무 느리다"는 비판을 받긴 했지만, 이것이 씨앗이 되어서 지금은 많은 언어에 표준적인 기능으로 자리잡았다.
+먼저 역사적인 배경을 한번 살펴보자. 최초의 가비지 컬렉션이 LISP 언어에 도입된 이유 중 하나는, 당시 메이저 언어 였던 ALGOL 언어에서 댕글링 포인터 문제, 그러니까 쓰던 메모리를 이미 해제했는데 그걸 모른채로 프로그램의 다른 부분에서 해제된 메모리 주소를 계속 갖고 있다가 사용해버리는 심각한 버그가 큰 이슈였다 (Use After Free). 그 당시 프로그래머라면 정말 똑똑한 소수의 선택된 사람들일텐데, 그런 친구들에게도 수동으로 메모리를 관리하는 일은 쉽지 않았던 것이다.
 
 **근데 이 문제는 지금도 해결되지 않았다.** 오히려 인터넷이 발전하면서 더 심각해졌다. Use After Free 버그는 이제 단순히 프로그램을 죽이는 데서 그치지 않고 프로그램의 보안 취약점이 되어 더 큰 문제를 만든다. 인터넷이 발전하면서 많은 것들이 가능해졌지만, 그로 인해 프로그램의 보안 취약점은 더이상 단순한 버그가 실제적인 위협이다. [마이크로소프트의 한 조사](https://www.microsoft.com/en-us/msrc/blog/2019/07/we-need-a-safer-systems-programming-language)에 따르면 매년 CVE (공개적으로 알려진 보안 취약점에 아이디를 붙이는 시스템) 의 약 70%가 메모리 안전정 문제라고 한다. [구글에서도 비슷한 결과](https://www.zdnet.com/article/chrome-70-of-all-security-bugs-are-memory-safety-issues/)를 발표한 적이 있는데, 크롬의 심각한 보안 관련 버그 중 70%가 메모리 관련 오류, 그 중 절반이 Use After Free였다고 한다.
 
@@ -159,12 +157,12 @@ title: 가비지 컬렉션 이야기
 ### 세 가지 색깔 (Tri-Colour Scheme)
 마크-스윕 컬렉션(과 그 변형)은 저마다의 방식으로 객체의 상태를 구분하는데, 가장 널리 쓰이는 방법 중 하나는 아래의 세 가지 색깔을 이용하는 방식이다.
 
- * 흰색: 컬렉터가 관심있는 대상이다.
+ * 흰색(Unmarked): 컬렉터가 관심있는 대상이다.
    * 마킹 페이즈 시작 전: 모든 오브젝트의 초기 상태를 나타낸다. 컬렉터는 루트 집합으로부터 닿을 수 있는 흰색 객체들을 하나씩 보면서 색깔을 칠해나간다.
    * 마킹 페이즈 완료 시: 마킹이 끝났는데도 여전히 흰색인 객체들은 루트 집합으로부터 닿을 수 없는 객체들 **(Unreachable Objects)**, 즉 **가비지**를 뜻한다.
    * 스위핑 페이즈에서: **가비지 수집 대상**이다. 흰색 객체의 메모리를 프리 리스트에 모아놨다가 나중에 재사용한다.
- * 회색: 마킹 페이즈에서만 임시로 쓰인다. 어떤 객체가 루트 집합으로부터 닿긴 했는데 아직 그 자식들(포인터를 따라갈 수 있는 객체들)까지는 살펴보지 않은 상태를 뜻한다.
- * 검은색: 루트 집합으로부터 닿을 수 있는 객체들 (**Reachable Objects**), 즉 "살아있는 객체들 (Live Object)"을 뜻한다. 얘네들은 아직 프로그램이 사용하고 있는 객체일 수 있기 때문에 스위핑 페이즈에서 살려둔다. 스위핑이 끝나고 나면 다시 색깔을 뒤집어서 흰색(초기 상태)으로 돌려둔다.
+ * 회색(In-Marking): 마킹 페이즈에서만 임시로 쓰인다. 어떤 객체가 루트 집합으로부터 닿긴 했는데 아직 그 자식들(포인터를 따라갈 수 있는 객체들)까지는 살펴보지 않은 상태를 뜻한다.
+ * 검은색(Marked): 루트 집합으로부터 닿을 수 있는 객체들 (**Reachable Objects**), 즉 "살아있는 객체들 (Live Object)"을 뜻한다. 얘네들은 아직 프로그램이 사용하고 있는 객체일 수 있기 때문에 스위핑 페이즈에서 살려둔다. 스위핑이 끝나고 나면 다시 색깔을 뒤집어서 흰색(초기 상태)으로 돌려둔다.
 
 이걸 바탕으로 트레이싱 컬렉션은 어떤 실행 시점에서 메모리 상의 객체들로 이뤄진 그래프를 탐색하면서 색깔을 칠하는 문제로 생각해볼 수 있다. 이번에는 이해를 돕기 위해서 그림을 한번 그려봤다. 각 그림의 설명은 그림 밑에 적었다.
 
@@ -218,20 +216,12 @@ title: 가비지 컬렉션 이야기
 
 즉, 뮤테이터와 컬렉터가 동시에 동작하는 경우에는 마킹 페이즈의 정확성이 깨져버린다. 그래서 이를 막기 위해서 마크 스윕 컬렉션은 그 악명 높은 STW(Stop-The-World) 조정을 도입한다. 프로그램을 일시정지 하는 것이다. 좀더 정확하게는, 컬렉터가 마킹 페이즈에 들어가서 노드를 색칠할 때에는 뮤테이터를 멈춘다. 스위핑 페이즈에서는 이미 마킹 페이즈에서 안전하게 가비지와 살아있는 객체를 구분했기 때문에 멈출 필요는 없다.
 
-### Snapshot-at-the-beginning Invariant
-마크 앤 스윕의 알고리즘 특성 상, **가비지 (즉 Unreachable Objects)의 수는 절대로 줄어들지 않는다**. 그래서 컬렉션 (정확히는 마킹) 을 시작하는 순간 현재 오브젝트들의 상태의 스냅샷(즉 주소 값들)을 복사해서 가지고 있으면서, 얘네들을 따라가서 가비지인지 여부를 확인한다. 이렇게 하면 **반드시 마킹 작업이 끝난다**는 것을 보장할 수 있는데, 컬렉션이 동작하는 도중에 힙에 오브젝트들이 계속 생기면, 이로 인해서 컬렉션이 늘어지거나 끝나지 않을 수 있기 때문이다. 그래서 보통은 이렇게 컬렉션이 시작하는 시점의 스냅샷만을 기준으로 GC가 동작한다.
+### Incremental Collection
+무작정 STW를 해버리면 마킹 페이즈에서 프로그램이 멈추게 되고 (Pause Time) 이로 인해 프로그램의 응답성을 예측할 수 없게 된다. 그래서 실시간 환경에 쓸 수 없다.
 
-## Mark-Sweep-Compact Collection
-마크 앤 스윕만 하면 메모리 단편화가 발생함. 이걸 해결하기 위해서 스위핑 구간에 압축(컴팩트) 연산을 도입.
+이걸 해결하기 위해서 도입한 것이 바로 증분 컬렉션(Incremental Collection)이다. 마킹을 전체 다 한꺼번에 하는게 아니라, 마킹이랑 스위핑 페이즈를 일단 나누고, 각 단계를 잘라서 (Slicing) 조금 씩 진행해서 (Incremental) 사용자 프로그램이 너무 긴 정지 시간 (Pause Time)을 겪지 않고 반응성이 좋도록 한다.
 
-## Copying Collection
-메모리를 두 덩어리로 나눈 다음 순차적으로 번갈아가면서 왔다갔다 하는거.
-
-## Incremental Collection
-responsiveness, 반응성이 중요.
-전체 다 한꺼번에 하는게 아니라, 마킹이랑 스위핑 페이즈를 일단 나누고, 각 단계를 잘라서 (Slicing) 조금 씩 진행해서 (Incremental) 사용자 프로그램이 너무 긴 정지 시간 (Pause Time)을 겪지 않고 반응성이 좋도록 한다.
-
-### Write (Read) Barrier
+#### Write (Read) Barrier
 Incremental을 도입하면 발생하는 문제를 해결하기 위해서 포인터 쓰기 연산에 도입되는 condition check. 컴파일러가 도와줘야 함. Barrier 라는 이름이 붙은 컬렉션은 incremental이 원조임.
 
 앞의 세 가지 색깔 스킴을 다시 떠올려보자. 그러면 당연히 검은색에서 흰색으로 가는 포인터가 없어야 한다. 근데 incremental하게 하면, 컬렉터가 동작하다가 잠깐 멈추고 뮤테이터가 객체 상태를 변경할 때 이 불변식을 지켜야한다. 예를 들어 컬렉션 도중 A 가 검은색으로 칠해졌고 그 자식들이 회색으로 칠해졌다고 하자. 뮤테이터가 A -> C(검은색 -> 회색)로 포인터가 있던 걸 B -> D (둘 다 흰색)랑 교환한다고 하자. 이러면 A(검은색)은 D(흰색)를 가리키게 되고, B(흰색)은 C(회색)를 가리키게 된다. 그리고 D를 가리키는 유일한 포인터는 A가 된다. C는 B(흰색)에 의해 다시 Reachable 하게 되고, D는 A 외에는 포인터가 없는데 A가 이미 검은색(GC Reachability Traversal이 끝났음)이라서 절대 Reachable하지 않게 된다. 이러고 GC Marking이 끝나면 Sweeping 때 D는 흰색이라서 가비지로 간주되어 회수되는데 원래는 회수되면 안되는 애다. 그래서 이 invariant가 필요하다. 그래서 이걸 지키기 위해서 모든 포인터 쓰기 연산에 배리어를 도입한 것임.
@@ -243,10 +233,56 @@ The roles a write barrier can play in GC are a little trickier to explain to a n
 1. Consider a simple generational stop-and-collect collector. "Generational" means that data is partitioned into /old/ and /new/. This partition is useful to the GC for two reasons: (a) because data tends to die young, collecting just new data will probably free a lot of space, and (b) because pointers tend to point from new objects to old objects, and not vice versa, it is cheap to find all the pointers to new objects.
    *Property (b) is only true if you can tell when a pointer to a new object has been written into an old object*. Otherwise you have to scan all the old objects to find pointers to new objects, which loses one of the main advantages of generational GC. So you put the old data behind a write barrier, and record those writes. When you come to GC the new data, you know the /only pointers from old to new are those which you have recorded/.
 2. Consider a tracing GC which is incremental or concurrent, i.e., the user's program or the 'mutator' can run before the GC is complete. Now there is an invariant: *black objects do not point to white objects*. If the mutator writes a white pointer into a black object, this invariant is broken and the GC can fail. There are two basic solutions: prevent the mutator from seeing white objects ("read barriers"), or prevent the mutator from writing white pointers into black objects ("write barriers"). *The write barrier solution puts the black objects behind a write barrier*. When a white-on-black write takes place, there are various fixes: incrementally grey the white object, re-grey the black object, etc.
-   (Note) For a tracing collector, marking or copying, one conceptually colours the data white (not yet seen by the collector), black (alive and scanned by the collector), and grey (alive but not yet scanned by the collector). The collector proceeds by scanning grey objects for pointers to white pointers. The white objects found are turned grey, and the grey objects scanned are turned black. When there are no more grey objects, the collection is copmlete, and *all the white objects can be recycled*.
+   (Note) For a tracing collector, marking or copying, one conceptually colours the data white (not yet seen by the collector), black (alive and scanned by the collector), and grey (alive but not yet scanned by the collector). The collector proceeds by scanning grey objects for pointers to white pointers. The white objects found are turned grey, and the grey objects scanned are turned black. When there are no more grey objects, the collection is complete, and *all the white objects can be recycled*.
+
+#### Snapshot-At-The-Beginning Invariant
+Incremental Collection의 또 다른 문제점은 컬렉터가 멈춰있는 동안 뮤테이터가 수많은 살아있는 객체를 추가할 수 있다는 점이다. 그래서 이론적으로는 마킹 페이즈가 끝나지 않을 수 있다. 즉, 컬렉터가 열심히 그래프를 색칠해 나가다가 잠깐 멈추고 뮤테이터한테 턴을 넘겨줬을 때 뮤테이터가 그래프에 새로운 닿을 수 있는 살아있는 객체들을 잔뜩 추가해버린 다음 다시 턴을 컬렉터에게 넘겨주고를 끊임없이 진행한다면 충분히 가능하다.
+
+그래서 이 문제를 해결하기 위해서 도입한 불변식이 바로 Snapshot-At-The-Beginning (SATB) Invariant, 우리 말로 하면 "(마킹) 시작할 때의 상태를 스냅샷으로 찍고 이거만 본다"는 것이다. 마킹 페이즈를 시작하는 순간 전체 그래프의 스냅샷을 찍어서 여기에 찍힌 노드들만 추적해서 마킹을 하는 방법이다. 이렇게 하면 **반드시 마킹 작업이 끝난다**는 것이 보장되어서 효율적인 컬렉션이 가능하다.
+
+---
+
+하지만 이 외에도 전통적인 마크 스윕 컬렉션에는 주요한 몇 가지 문제가 있다.
+
+가장 먼저 메모리 단편화[^5]. 위의 그림에서는 그냥 그래프의 노드로 표현했지만 실제로는 힙의 어떤 연속된 구간에 할당되는 메모리들이고, 컬렉터는 관리할 메모리 영역의 시작과 끝을 알아야 한다. 그래서 살아있는 객체와 (수집되는) 가비지 객체가 뒤섞여 있어서 나중에는 큰 크기의 메모리를 할당하기 어려워질 수 있다. 프리 리스트를 여러 크기 별로 만들고 비슷한 크기끼리 수집하는 일종의 크기 별 메모리 풀을 이용해서 이걸 완화할 순 있지만 그래도 어렵다. 그래서 필요에 따라 더 많은 객체를 할당하고 나중에 컬렉터가 일을 더 많이해서 메모리를 필요한 만큼 타이트하게 관리할지, 아니면 아예 처음부터 커다란 메모리 덩어리를 할당한 다음 이걸 쪼개어 관리하면서 단편화 위험을 줄이되 메모리를 조금 낭비할지, 이 트레이드 오프 사이에서 어떤 시스템이 될지를 선택해야 한다.
+
+또 다른 문제는 컬렉터가 가비지를 수집하는 스위핑 페이지에서 **관리하는 메모리 구역 전체**를 살펴봐야 한다는 것이다. 이건 근본적으로 "마킹"이 "살아있는 객체"를 구분하는 것인 반면 "스위핑"이 관심있는 대상은 그 반대인 "죽은 객체"라서, 어쩔 수 없는 한계다.
+
+마지막으로 전반적으로 관리되는 메모리가 캐시 친화적이지 않다는 문제점이 있다. 객체들은 한번 할당되고 나면 거기 계속 남아있고, 이것들 사이에 있던 가비지가 수집되어 이후 할당에 쓰이게 되면, 서로 용도와 수명주기가 다른 객체들이 섞이게 된다. 그래서 계산을 위해 이들 객체에 접근하는 작업의 지역성이 나빠서 캐시 친화적이지 못해 성능의 손해를 본다. 게다가 컬렉션이 진행될수록 살아있는 객체들의 메모리 분포가 나빠질 수 있는데, 많은 객체를 필요로 하는 프로그램의 경우 마킹 페이즈에서 살펴봐야 하는 노드(객체)들이 서로 너무 먼 곳에 떨어져 있게 되면 닿을 수 있는 객체를 살펴보기 위한 그래프 탐색 역시 캐시 친화적이지 않아서 성능에 큰 손해를 보게 된다.
+
+물론 이것들은 다양한 최적화 기법을 통해서 해결하거나 우회할 수 있다.
+
+## Mark-Compact Collection
+마크 스윕 컬렉션의 단편화 문제를 해결하기 위해서 압축(Compact) 단계를 도입한 컬렉션 방법이다.
+
+## Copying Collection
+메모리를 두 덩어리로 나눈 다음 순차적으로 번갈아가면서 왔다갔다 하는거.
 
 ## Generational Collection
-세대 가설 - 대부분의 데이터는 빨리 죽는다 (Die Young). 이로 인해서 말 그대로 여러 개의 힙을 운영하는 것이 가능해진다. 그래서 보통은 두 개의 힙을 운영한다.
+1980년대 실시간 어플리케이션 개발에 쓰이던 Smalltalk이라는 언어가 있었는데 얘가 트레이싱 컬렉션을 탑재한 가비지 컬렉션 언어였다. 하지만 여러가지 한계로 인해서 당시 구현된 STW Coordination의 긴 정지 시간으로 인해 "실시간"을 달성하는 게 쉽지 않았다고 한다. 예를 들어, 게임이나 애니메이션을 만드는데 갑자기 GC가 초단위의 시간을 멈춰버리면 사용자들은 화가 날 것이다.
+
+그래서 이 문제를 해결하기 위한 다양한 연구가 이루어졌고, 그 중에서 지금까지도 가비지 컬렉션 뿐만 아니라 수많은 메모리 관리 기법에 커다란 영향을 남긴 것이 바로 David Ungar의 **"세대 가설(Generational Hypothesis)"**이다. "대부분의 객체는 (다 쓰고 나면) 빨리 죽는다 (Most objects are die young)"는 것을 경험적으로 관찰한 것인데, 실제 프로그램의 메모리 사용 패턴을 분석해보니 언어나 프로그램에 상관없이 대부분(80-98%)의 객체는 잠깐만 살아 있다가 사라지고 일부 객체들만이 오래 살아남는다는 놀라운 발견이었다.
+
+세대 가설은 가비지 컬렉션의 패러타임을 완전히 바꿔버렸다. 이후 나온 가비지 컬렉션은 이 가설에 근거해서 아이디어를 체계화해서 컬렉터가 관리하는 힙 메모리를 수명주기를 기준으로 두 개 이상의 세대로 나누고 각각의 세대마다 메모리 관리 알고리즘을 다르게 적용하여 최적의 성능을 내도록 하는 방향으로 진화가 일어난 것이다.
+
+대부분의 GC 언어는 두 개의 세대를 운영한다.
+ * 첫 번째 세대: 모든 객체가 처음 할당되는 곳이다. 세대 가설에 따라 여기 할당된 객체들은 대부분 살아남지 못하고 수집될 것이다. 언어마다 명칭이 다른데 마이너 힙, 어린 힙, Generation 0, 에덴 공간 등 다양한 재밌는 이름으로 불린다.
+ * 두 번째 세대: 첫 번째 세대를 살아남는 객체들이 옮겨지는 곳이다. 여기까지 온 객체들은 훨씬 더 오래 살아남는 경향이 있다. 그래서 이 세대의 메모리에 가비지 컬렉션이 동작하게 되면 첫 번째 세대보다는 수집되는 비율이 적을 수 있다. 메이저 힙, 성숙한 힙, Generation 1, 생존자 공간 등으로 불린다.
+
+세 개 이상의 세대를 가진 가장 성공적인 언어는 바로 C#(.NET)이다. 닷넷은 총 세 개의 세대와 하나의 별도 힙을 관리하는데,
+ * Generation 0: 첫번째 세대.
+ * Generation 1: 첫번째 세대를 살아남은 중간 세대. 버퍼 역할을 한다.
+ * Generation 2: 마지막 세대. 길게 살아남은 객체들이 여기 있다.
+ * LOH(Large Object Heap): 85KB 이상의 큰 객체는 곧바로 여기에 할당되며 별도로 관리한다.
+
+세대 가설에 따르면 세대가 지나갈수록, 즉 Generation 0에서 살아남아 Generation 1, Generation 2로 갈수록 살아남은 객체들은 오래 살아남을 것이고 따라서 가비지 컬렉션이 호출되는 빈도가 급격히 줄어들 것이다. 덕분에 어마무시한 성능을 얻을 수 있다.
+
+자바도 공식적으로는 Young Generation과 Old Generation 두 개의 세대를 운영하지만, 실제로는 Young Generation이 세 개의 영역으로 세분화되어 있다.
+ * 에덴 공간: 첫번째 세대.
+ * Survivor 0: 첫번째 세대를 살아남은 세대.
+ * Survivor 1: 역시 첫번째 세대를 살아남은 세대.
+
+에덴 공간에서 살아남은 객체들이 Survivor 0과 1 세대를 번갈아 이동하고 나중에 오래 살아남은 애들은 Old Generation으로 가게 된다.
 
 ### Minor Heap
 Youngest Heap, Bump Pointer Collection
@@ -256,6 +292,8 @@ Old Heap, Mark & Sweep Collection
 
 ### Write (Read) Barrier
 Generational을 도입하면 발생하는 문제를 해결하기 위해서 포인터 쓰기 연산에 도입되는 condition check. 컴파일러가 도와줘야 됨. Incremental에서 쓰이던 Barrier 기법이 그대로 적용되어서 같은 이름이 붙었고 요즘은 Generational에서 발생하는 문제가 더 커서 generational barrier가 좀더 유명함. 메이저 힙에서 마이너 힙으로 가는 포인터를 기록함.
+
+여러 세대로 나눠진 경우, 세대가 다른 객체끼리 참조하게 되면 문제가 생긴다. 그래서 (특히 포인터를) 읽거나 쓰는 작업을 그냥 하면 안되고 이게 세대를 넘어서 이뤄지는 작업인지를 확인해야 한다. 이렇게 세대 간의 참조를 추적하기 위한 방법이 바로 쓰기 장벽 혹은 읽기 장벽이다.
 
 # 고급 기능들
 이렇게 가비지 컬렉션은 자동으로 객체의 메모리를 할당하고, 가비지 여부를 탐지하고, 메모리를 수집해뒀다가 재사용하게 해주지만, 가끔은 컬렉터의 감시를 벗어나 프로그래머가 더 미세 조정을 할 수 있게 하는 고급 기능들도 필요하다. 레퍼런스 카운팅이든 트레이싱 컬렉션이든 상관없이 보통은 아래와 같은 고급 기능들이 있다.
@@ -299,6 +337,14 @@ In the case of Java, the approach taken was /to declare that finalisers are neve
 One partial solution to this problem is to encourage people to use "the right tools for the job." Languages with GC often include control constructs for running finalisers at certain points in a program's execution. These can be used where timely, certain, finalisation is required. Finalisation associated with garbage collection can be used for those resources that are either abundant-but-not-infinite (like memory) or as a statistical backstop to reduce the loss of resources that are managed by hand (similar to the way in which garbage collection itself can be used as a backstop for manual deallocation).
 
 # 재밌는 사실들
+## 존 매커시의 생각
+1959년 존 매커시가 LISP에 가비지 컬렉션을 구현했을 당시 하드웨어 환경은 지금과 비교하면 엄청나게 열악했다. 메모리가 32KB 수준이었다. MB도 아니고 KB다. 그래서 당시 LISP의 가비지 컬렉션은 상당히 느린 편이었고, 존 매커시도 약간 임시 방편같은 느낌으로 생각했다고 한다. 시간이 지나면 연구자와 엔지니어들이 더 나은 방법을 찾을 것이라고 믿었던 것이다. 하지만 60년도 더 지난 지금, 오히려 많은 현대의 프로그래밍 언어에서 가비지 컬렉션은 핵심 기능으로 자리 잡은 사실이 재밌다.
+
+## 가비지 컬렉션을 위한 하드웨어
+가비지 컬렉션은 1959년에 LISP 프로그래밍 언어에 도입된 만큼 굉장히 오랜 세월 여러가지 언어에서 연구되고 개발되어 왔다. 그러다보니 정말 다양한 접근이 시도되었는데 그 중 하나는 바로 가비지 컬렉션을 위한 특수 하드웨어가 있었다는 점이다. 1980년대에 있었던 특수 목적 컴퓨터인 Symbolics나 TI Explorer는 "LISP 머신"(진짜 기계)였는데, 트레이싱 컬렉션의 쓰기 배리어 연산을 효율적으로 하기 위한 특수 하드웨어 연산이 지원되는 전용 FPGA가 달려있었다. 그래서 메모리 쓰기 연산이 발생하면 자동으로 쓰기 배리어 로직을 적용해서 기록했다고 한다.
+
+당시에는 이런 특수한 하드웨어가 인공지능 연구에 필수적이라고 생각했었지만 이후에 PC의 성능이 급격하게 좋아지면서 경제성이 안나와서 금방 단종되었다고 한다.
+
 ## Duality
 
 사실 레퍼런스 카운팅이랑 트레이싱 컬렉션은 수학적으로 듀얼이다!
@@ -320,7 +366,7 @@ One partial solution to this problem is to encourage people to use "the right to
  * 배열 바운드 체크: OCaml은 모든 배열 연산에 기본적으로 바운드 체크를 한다 (진짜인가?)
  * 함수 호출: C는 표준적인 함수 호출 컨벤션을 따르는 반면, 함수형 언어인 OCaml에서는 클로저가 오버헤드가 있다.
  * 컴파일러 최적화: 수십년간 수많은 엔지니어와 연구자들이 최적화한 GCC/Clang에 비해서 OCaml의 최적화는 부족한 부분이 있을 수 있다.
- * Write Barrier 오버헤드: OCaml의 Generational GC를 위해서 Write Barrier는 필수인데, 이 오버헤드는 GC 시간 측정에 포함되지 않는다.
+ * Write Barrier 오버헤드: OCaml의 Generational GC를 위해서 Write Barrier는 p필수인데, 이 오버헤드는 GC 시간 측정에 포함되지 않는다.
  * 메모리 할당자: OCaml은 GC의 할당자를 쓸 수 밖에 없지만, C에서는 다양하게 최적화된 할당자들이 많다. tcmalloc, jemalloc 등. 이 중에 어떤 걸 써야 공정한 비교일까?
  * 가비지 컬렉션 자체의 튜닝 파라미터: 가장 유명한 GC 언어인 Java의 경우, "너한테 할당된 메모리 용량은 최대 이만큼임" 정도의 튜닝만이 가능하다. 그래서 메모리를 약간 낭비하면서 속도를 가져가려는 경향이 있다고 한다. 반면 OCaml의 경우는 "실제로 써야하는 메모리보다 최대 이만큼 정도만 낭비하도록 하세요" 느낌의 튜닝이 가능하고, 이를 Space Overhead 라고 한다. 즉, 실제로 메모리 할당이 100GB를 했고, 20%의 공간 오버헤드를 파라미터로 갖고 있다면, 최대 120GB 만큼의 메모리만 사용하도록 GC가 열심히 일할 것이다.
 
@@ -330,8 +376,11 @@ One partial solution to this problem is to encourage people to use "the right to
 
 글을 적는데 참고한 것들.
  - [Uniprocessor Garbage Collection Techniques](https://www.cs.cmu.edu/~fp/courses/15411-f08/misc/wilson94-gc.pdf) by Paul R. Wilson (CMU)
+ - [Generation Scavenging: A Non-disruptive High Performance Storage Reclamation Algorithm](https://people.cs.umass.edu/~emery/classes/cmpsci691s-fall2004/papers/p157-ungar.pdf) by David Ungar
  - [A Unified Theory of Garbage Collection](https://web.eecs.umich.edu/~weimerw/2008-415/reading/bacon-garbage.pdf) by David F. Bacon et. al (IBM Watson)
  - [GC FAG -- draft](https://iecc.com/gclist/GC-faq.html)
  - [MemFix: Static Analysis-Based Repair of Memory Deallocation Errors for C](https://prl.korea.ac.kr/papers/fse18.pdf)
 
 ---
+
+[^5]: 사실 이 문제는 마크 스윕에만 한정된 문제는 아니고 대부분의 힙 관리 방법에 공통된 문제다.
