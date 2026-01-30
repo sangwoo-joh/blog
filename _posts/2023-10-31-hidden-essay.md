@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [life, idea]
+tags: [life, musing]
 title: 쉽지 않다.
 last_update: 2024-03-27 11:30:02
 ---

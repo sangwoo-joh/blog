@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [cs, idea]
+tags: [cs, musing]
 published: true
 title: 코드 읽기
 subtitle: Reading Code Is A Skill

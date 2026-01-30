@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [other, idea]
+tags: [other, musing]
 published: false
 title: 글 쓰는 일에 대한 두려움
 last_update: 2024-03-27 11:18:05

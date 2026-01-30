@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [idea]
+tags: [musing]
 title: 불확실성 줄이기
 ---
 

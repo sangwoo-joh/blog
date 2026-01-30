@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [idea, cs]
+tags: [musing, cs]
 published: true
 title: 나의 개발 프로세스
 last_update: 2024-03-27 11:58:58

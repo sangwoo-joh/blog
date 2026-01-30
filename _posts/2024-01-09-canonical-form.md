@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [cs, idea]
+tags: [cs, musing]
 title: Canonical Form
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tag: [life, idea]
+tag: [life, musing]
 title: 먼저 온 미래
 ---
 

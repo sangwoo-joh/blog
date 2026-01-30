@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [idea]
+tags: [musing]
 published: true
 title: 모니터 철학
 subtitle: 개똥철학

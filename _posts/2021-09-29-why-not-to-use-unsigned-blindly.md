@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [cs, idea]
+tags: [cs, musing]
 published: true
 title: 함부로 unsigned를 쓰지 말아야 할 이유
 ---

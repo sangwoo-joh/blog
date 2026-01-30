@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [idea, cs]
+tags: [musing, cs]
 published: true
 title: 1조짜리 실수
 ---

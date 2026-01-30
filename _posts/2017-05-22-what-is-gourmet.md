@@ -1,6 +1,6 @@
 ---
 layout: post
-tags: [idea]
+tags: [musing]
 published: true
 title: 미식이란...
 subtitle: 대체 뭘까

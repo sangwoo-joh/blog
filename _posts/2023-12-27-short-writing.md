@@ -1,7 +1,7 @@
 ---
 layout: post
 published: true
-tags: [idea]
+tags: [musing]
 title: 짧은 글 쓰기
 ---
 
