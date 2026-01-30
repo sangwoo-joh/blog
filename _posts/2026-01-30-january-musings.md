@@ -1,6 +1,6 @@
 ---
 layout: post
-published: true
+published: false
 tag: [musing]
 title: 1월의 잡상
 ---
