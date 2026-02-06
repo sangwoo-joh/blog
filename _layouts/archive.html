@@ -4,16 +4,18 @@ layout: default
 <a href="{{ site.url }}">{{ site.theme_config.back_home_text }}</a>
 <br />
 <br />
-태그 목록: <span class="tag" data-tag="all">전체</span>
+태그 목록:
+<span class="tag" data-tag="all">전체<span class="count">[{{site.posts | size}}]</span></span>
+
 {% for tag in site.data.tags %}
   <span class="tag" data-tag="{{tag}}">
-    {{ tag }}
+    {{ tag }}<span class="count">[{{ site.tags[tag] | size }}]</span>
   </span>
 {% endfor %}
 
 <hr />
 
-[<span class="count"></span>]
+[<span class="filter-count"></span>]
 
 {% for post in site.posts %}
   {% assign postyear = post.date | date: "%Y" %}
@@ -82,7 +84,7 @@ layout: default
     $('.hidden').removeClass('hidden');
     $(`.tag`).removeClass('selected');
     $(`.tag[data-tag=all]`).addClass('selected');
-    $(".count").text($(".post-preview").length);
+    $(".filter-count").text($(".post-preview").length);
   }
 
   function filterByTagName(tagName) {
@@ -105,6 +107,6 @@ layout: default
 
     $(`.tag`).removeClass('selected');
     $(`.tag[data-tag=${tagName}]`).addClass('selected');
-    $(".count").text(counter);
+    $(".filter-count").text(counter);
   }
 </script>
