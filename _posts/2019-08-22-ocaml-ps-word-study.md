@@ -172,7 +172,7 @@ let () = solve ()
 일단 OCaml은 여타 언어와 달리 빌트인 정수형이 32비트도 64비트도 아닌 [1비트 버린 타입](http://dev.realworldocaml.org/runtime-memory-layout.html#integers-characters-and-other-basic-types)을 쓰기 때문에 64비트 환경에서는 63비트가 된다. 이건 OCaml의 메모리 표현과 관련이 있는데 나중에 살펴보자. 암튼 `Int32`나 `Int64`는 이런 OCaml의 자연스러움을 무시하고 강제로 32비트, 64비트를 맞추기 때문에 속도 면에서 손실이다. 이거만 바꿔줬는데도 시간이 420ms로 무려 28ms나 줄었다!
 
 
-다음은 빈도수를 셀 때 해시 테이블이 아닌 [배열](http://caml.inria.fr/pub/docs/manual-ocaml-4.07/libref/Array.html)을 써보자. 뭔가 배열을 쓰면 함수형이 아닌 명령형, 즉 사도의 길을 걷는 것이라고 마음속으로 여기고 있었는지 모르겠다. 거기다 개인적으로 밸런스 트리가 최애라서 ([이런 글](https://sangwoo-joh.github.io/avl-tree)을 쓰기도 하였고..), 어떤 문제든 일단 맵 부터 적용하고 보는 못된 버릇이 있다. 반성한다. 그리고 해시 테이블의 경우는 예전에 [Jane Street 블로그](https://blog.janestreet.com/what-a-jane-street-dev-interview-is-like/)에서 본 뒤로 언젠가는 써먹어야지.. 하고 생각하다보니 나타난듯 하다. 이것 역시 반성한다. 뭔가 참회의 글만 잔뜩 적어놨는데 이제부턴 코드로 말하자.
+다음은 빈도수를 셀 때 해시 테이블이 아닌 [배열](http://caml.inria.fr/pub/docs/manual-ocaml-4.07/libref/Array.html)을 써보자. 뭔가 배열을 쓰면 함수형이 아닌 명령형, 즉 사도의 길을 걷는 것이라고 마음속으로 여기고 있었는지 모르겠다. 거기다 개인적으로 밸런스 트리가 최애라서 ([이런 글](https://blog.untyped.kr/avl-tree)을 쓰기도 하였고..), 어떤 문제든 일단 맵 부터 적용하고 보는 못된 버릇이 있다. 반성한다. 그리고 해시 테이블의 경우는 예전에 [Jane Street 블로그](https://blog.janestreet.com/what-a-jane-street-dev-interview-is-like/)에서 본 뒤로 언젠가는 써먹어야지.. 하고 생각하다보니 나타난듯 하다. 이것 역시 반성한다. 뭔가 참회의 글만 잔뜩 적어놨는데 이제부턴 코드로 말하자.
 
 
 ```ocaml

@@ -17,4 +17,4 @@ title: 짧은 글 쓰기
  
  새해에는 괜히 길고 복잡한 글을 쓰기 보다는, 초심으로 돌아가서 짧은 글을 자주 써 보려고 한다. 긴 호흡으로 글을 쓰는 일은 재미있긴 하지만 힘들고 준비도 많이 필요해서 자주 하긴 어렵다. 그리고 요즘 [org-roam](https://www.orgroam.com/)으로 생각을 정리하는 데에 재미를 붙이고 있는데, 그러다보니 짧은 글을 자주 쓰는 것이 더 도움이 된다는 사실도 깨달았다.
  
- 참고로 통계를 내는데 쓰인 스크립트는 [여기](https://github.com/sangwoo-joh/sangwoo-joh.github.io/blob/exhibit/script/stat.py)에서 볼 수 있다.
+ 참고로 통계를 내는데 쓰인 스크립트는 [여기](https://github.com/sangwoo-joh/blog/blob/exhibit/script/stat.py)에서 볼 수 있다.

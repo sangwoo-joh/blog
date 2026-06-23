@@ -43,8 +43,8 @@ last_update: 2022-12-08 16:51:08
 
  쉬엄쉬엄 하다보니 어느새 완성해버렸다. **[updated!]** 레이블은
  [**\[new!\]** 레이블을 붙였을
- 때와](https://github.com/sangwoo-joh/sangwoo-joh.github.io/commit/87d15788a91c8a51cca8896d18d80793f191a822)
- [유사하게](https://github.com/sangwoo-joh/sangwoo-joh.github.io/commit/51f1f1a7721794b4768ddf09ebff289f7f751769)
+ 때와](https://github.com/sangwoo-joh/blog/commit/87d15788a91c8a51cca8896d18d80793f191a822)
+ [유사하게](https://github.com/sangwoo-joh/blog/commit/51f1f1a7721794b4768ddf09ebff289f7f751769)
  구현하였다. 마지막까지 `updated`, `revised`, `changed` 등의 표현
  중에서 뭐가 제일 자연스러운지 고민했는데 네이티브가 아니니 그냥 처음
  떠오른 걸로 가기로 했다.
