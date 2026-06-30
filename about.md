@@ -22,7 +22,11 @@ last_update: 2024-07-26 14:39:34
 
 > 세상에 끈기를 대신할 수 있는 것은 아무것도 없다. 재능도 아니다; 재능이 있어도 실패하는 사람들이 얼마나 흔한가. 천재성도 소용없다; 보상받지 못한 천재는 거의 속담과 같다. 교육도 아니다; 세상은 교육받은 낙오자들로 가득하다. 오직 끈기와 결단력만이 전능하다. - 레이시 크록 (Racy Kroc)
 
-> 인생의 비밀은 평생을 바칠 과업을 갖는 것이다. 온 삶을, 매 순간을 그 일에 쏟아붓는 것이다. 그리고 가장 중요한 것은, 그 과업은 결코 해낼 수 없을 것 같은 일이어야 한다. - 헨리 무어 (Henry Moore)
+<!-- > "I was born not knowing and have had only a little time to change that here and there." -->
+> 나는 모르는 채로 태어났고, 여기저기 조금씩 그것을 바꿀 시간만 주어졌다. - 리차드 파인만
+
+<!-- "The good life is one inspired by love and guided by knowledge." -->
+> 좋은 삶은 사랑에서 영감을 받고 지식에 의해 이끌리는 삶이다. - 버드런트 러셀
 
 ## 작업들
  * [`.doom.d`](https://github.com/sangwoo-joh/.doom.d): 둠 이맥스 설정
