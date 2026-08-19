@@ -28,6 +28,9 @@ last_update: 2024-07-26 14:39:34
 <!-- "The good life is one inspired by love and guided by knowledge." -->
 > 좋은 삶은 사랑에서 영감을 받고 지식에 의해 이끌리는 삶이다. - 버드런트 러셀
 
+<!-- > Please do not take life quite so seriously; you surely will never get out of it alive. - Elbert Hubbard -->
+> 인생을 너무 심각하게 받아들이지 마라. 어차피 살아서 나갈 수는 없으니까. - 엘버트 허버드
+
 ## 작업들
  * [`.doom.d`](https://github.com/sangwoo-joh/.doom.d): 둠 이맥스 설정
  * [`.dotfiles`](https://github.com/sangwoo-joh/.dotfiles): 원 클릭 리눅스/맥 셋업
